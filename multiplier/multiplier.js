@@ -128,7 +128,7 @@ async function create_multiplication_table( ServiceClient, Size )
 {
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).ImmediateMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).DeferredMultiplierService();
-	let multiplier_service = await require( './MultiplierServiceFactory.js' ).ThreadWorkerMultiplierService();
+	let multiplier_service = await require( './MultiplierServiceFactory.js' ).WorkerThreadMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).StompMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).TortoiseMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).AmqpLibMultiplierService();

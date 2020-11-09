@@ -36,7 +36,7 @@ exports.StompServiceProvider =
 
 
 			//---------------------------------------------------------------------
-			is_port_open: false,
+			IsPortOpen: false,
 
 
 			// //---------------------------------------------------------------------
@@ -67,7 +67,7 @@ exports.StompServiceProvider =
 				async function OpenPort()
 				{
 					this.QueueClient = await LIB_STOMPIT.connect( this.Options );
-					this.is_port_open = true;
+					this.IsPortOpen = true;
 					return;
 				},
 
@@ -78,7 +78,7 @@ exports.StompServiceProvider =
 				async function ClosePort()
 				{
 					// this.QueueClient.close();
-					this.is_port_open = false;
+					this.IsPortOpen = false;
 					let message_count = this.Messages.length;
 					if ( message_count > 0 )
 					{

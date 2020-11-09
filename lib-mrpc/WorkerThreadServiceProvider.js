@@ -4,7 +4,11 @@
 /*
 NOTES:
 	- Requires `Node.js v12 LTS`
-	- Can be used with `Node.js v10.5.0`. Requires Node to be run with the `--experimental-worker` flag.
+	- Can be used with `Node.js v10.5.0`, but requires Node to be run with the `--experimental-worker` flag.
+	- There are certain restrictions to code running in a Worker,
+		see: https://nodejs.org/docs/latest-v12.x/api/worker_threads.html#worker_threads_class_worker
+	- There are certain restrictions to the CommandParameters passed to code running in a Worker,
+		see: https://nodejs.org/docs/latest-v12.x/api/worker_threads.html#worker_threads_port_postmessage_value_transferlist
 REFS:
 	https://nodejs.org/docs/latest-v12.x/api/worker_threads.html
 	https://blog.logrocket.com/node-js-multithreading-what-are-worker-threads-and-why-do-they-matter-48ab102f8b10/
@@ -14,6 +18,21 @@ REFS:
 
 
 const LIB_ENDPOINTS_MANAGER = require( './EndpointsManager.js' );
+const
+	{
+		Worker,
+		isMainThread,
+		parentPort,
+		workerData
+	} = require( 'worker_threads' );
+
+
+/*
+let Options =
+{
+	max_threads: 10,
+};
+*/
 
 
 exports.WorkerThreadServiceProvider =
@@ -26,7 +45,7 @@ exports.WorkerThreadServiceProvider =
 			ServiceName: ServiceName,
 			Options: Options,
 			Endpoints: LIB_ENDPOINTS_MANAGER.NewEndpoints(),
-			is_port_open: false,
+			IsPortOpen: false,
 
 
 			//---------------------------------------------------------------------
@@ -34,7 +53,7 @@ exports.WorkerThreadServiceProvider =
 			OpenPort:
 				async function OpenPort()
 				{
-					this.is_port_open = true;
+					this.IsPortOpen = true;
 					return;
 				},
 
@@ -44,7 +63,7 @@ exports.WorkerThreadServiceProvider =
 			ClosePort:
 				async function ClosePort()
 				{
-					this.is_port_open = false;
+					this.IsPortOpen = false;
 					return;
 				},
 
@@ -79,7 +98,7 @@ exports.WorkerThreadServiceProvider =
 
 			//---------------------------------------------------------------------
 			CallEndpoint:
-				async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback ) 
+				async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback = null ) 
 				{
 					// Validate that the endpoint exists.
 					if ( !this.Endpoints.EndpointExists( EndpointName ) )
@@ -89,13 +108,38 @@ exports.WorkerThreadServiceProvider =
 					// Invoke the endpoint.
 					try
 					{
-						// let result = await this.Endpoints[ EndpointName ].Handler( CommandParameters );
-						let result = await this.Endpoints.HandleEndpoint( EndpointName, CommandParameters );
-						ReplyCallback( null, result );
+						let endpoint_handler = this.Endpoints.Endpoints[ EndpointName ].Handler;
+						let endpoint_handler_script = endpoint_handler.toString();
+						let thread_script =
+							`
+							const { parentPort, workerData } = require( 'worker_threads' );
+							let result =
+							(
+								${endpoint_handler_script}
+							)( workerData );
+							parentPort.postMessage( result );
+							`;
+						let worker = new Worker(
+							thread_script,
+							{
+								eval: true,
+								workerData: CommandParameters,
+							}
+						);
+						if ( ReplyCallback )
+						{
+							worker.once( 'message', ( reply ) => ReplyCallback( null, reply ) );
+							worker.once( 'error', ( error ) => ReplyCallback( error, null ) );
+						}
+						else
+						{
+							worker.once( 'error', ( error ) => { throw error; } );
+						}
+						// worker.postMessage( CommandParameters );
 					}
 					catch ( error )
 					{
-						ReplyCallback( error, null );
+						if ( ReplyCallback ) { ReplyCallback( error, null ); }
 					}
 					// Return, OK.
 					return;

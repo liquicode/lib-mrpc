@@ -9,7 +9,7 @@ REFS:
 */
 
 const LIB_UNIQID = require( 'uniqid' );
-const LIB_ENDPOINTS_MANAGER = require('./EndpointsManager.js')
+const LIB_ENDPOINTS_MANAGER = require( './EndpointsManager.js' );
 
 /*
 let Options =
@@ -47,7 +47,7 @@ exports.AmqpLibServiceProvider =
 			ServiceName: ServiceName,
 			Options: Options,
 			Endpoints: LIB_ENDPOINTS_MANAGER.NewEndpoints(),
-			is_port_open: false,
+			IsPortOpen: false,
 			QueueClient: null,
 			QueueChannel: null,
 			Messages: [],
@@ -62,7 +62,7 @@ exports.AmqpLibServiceProvider =
 					this.QueueClient = await LIB_AMQPLIB.connect( this.Options.server );
 					this.QueueChannel = await this.QueueClient.createChannel();
 					result_ok = await this.QueueChannel.prefetch( 1 );
-					this.is_port_open = true;
+					this.IsPortOpen = true;
 					return;
 				},
 
@@ -74,7 +74,7 @@ exports.AmqpLibServiceProvider =
 				{
 					this.QueueChannel.close();
 					this.QueueClient.close();
-					this.is_port_open = false;
+					this.IsPortOpen = false;
 					let message_count = this.Messages.length;
 					if ( message_count > 0 )
 					{
@@ -161,7 +161,7 @@ exports.AmqpLibServiceProvider =
 
 			//---------------------------------------------------------------------
 			CallEndpoint:
-				async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback ) 
+				async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback = null ) 
 				{
 					// Validate that the endpoint exists.
 					if ( !this.Endpoints.EndpointExists( EndpointName ) )
@@ -169,40 +169,44 @@ exports.AmqpLibServiceProvider =
 						throw new Error( `The endpoint [${EndpointName}] does not exist within [${this.ServiceName}].` );
 					}
 					// Setup the reply channel
-					let This = this;
-					let reply_id = LIB_UNIQID();
-					let result_ok = null;
-					let reply_queue_name = `${this.ServiceName}/${EndpointName}/${reply_id}`;
-					result_ok = await this.QueueChannel.assertQueue( reply_queue_name, REPLY_CHANNEL_OPTIONS );
-					result_ok = await this.QueueChannel.consume(
-						reply_queue_name,
-						function ( message )
-						{
-							if ( !message )
+					let reply_id = null;
+					if ( ReplyCallback )
+					{
+						reply_id = LIB_UNIQID();
+						let This = this;
+						let result_ok = null;
+						let reply_queue_name = `${this.ServiceName}/${EndpointName}/${reply_id}`;
+						result_ok = await this.QueueChannel.assertQueue( reply_queue_name, REPLY_CHANNEL_OPTIONS );
+						result_ok = await this.QueueChannel.consume(
+							reply_queue_name,
+							function ( message )
 							{
-								// console.warn( `An empty message was delivered on the reply channel.` );
-								return;
-							}
-							try
-							{
-								let message_string = message.content.toString();
-								// console.debug( `Reply: ${message_string}` );
-								let reply = JSON.parse( message_string );
-								ReplyCallback( null, reply );
-							}
-							catch ( error )
-							{
-								console.error( Error.message, error );
-								ReplyCallback( error, null );
-							}
-							finally
-							{
-								// result_ok = await This.QueueChannel.deleteQueue( reply_queue_name );
-								This.QueueChannel.deleteQueue( reply_queue_name );
-							}
-						},
-						{ noAck: true }
-					);
+								if ( !message )
+								{
+									// console.warn( `An empty message was delivered on the reply channel.` );
+									return;
+								}
+								try
+								{
+									let message_string = message.content.toString();
+									// console.debug( `Reply: ${message_string}` );
+									let reply = JSON.parse( message_string );
+									ReplyCallback( null, reply );
+								}
+								catch ( error )
+								{
+									console.error( Error.message, error );
+									ReplyCallback( error, null );
+								}
+								finally
+								{
+									// result_ok = await This.QueueChannel.deleteQueue( reply_queue_name );
+									This.QueueChannel.deleteQueue( reply_queue_name );
+								}
+							},
+							{ noAck: true }
+						);
+					}
 					// Build the message.
 					let message =
 					{

@@ -4,6 +4,13 @@
 const LIB_ENDPOINTS_MANAGER = require( './EndpointsManager.js' );
 
 
+/*
+let Options =
+{
+};
+*/
+
+
 exports.DeferredServiceProvider =
 	function DeferredServiceProvider( ServiceName, Options )
 	{
@@ -14,7 +21,7 @@ exports.DeferredServiceProvider =
 			ServiceName: ServiceName,
 			Options: Options,
 			Endpoints: LIB_ENDPOINTS_MANAGER.NewEndpoints(),
-			is_port_open: false,
+			IsPortOpen: false,
 			Messages: [],
 
 
@@ -30,11 +37,11 @@ exports.DeferredServiceProvider =
 					try
 					{
 						let result = await this.Endpoints.HandleEndpoint( message.EndpointName, message.CommandParameters );
-						message.ReplyCallback( null, result );
+						if ( message.ReplyCallback ) { message.ReplyCallback( null, result ); }
 					}
 					catch ( error )
 					{
-						message.ReplyCallback( error, null );
+						if ( message.ReplyCallback ) { message.ReplyCallback( error, null ); }
 					}
 					return;
 				},
@@ -45,8 +52,8 @@ exports.DeferredServiceProvider =
 			OpenPort:
 				async function OpenPort()
 				{
-					this.is_port_open = true;
-					while ( this.is_port_open )
+					this.IsPortOpen = true;
+					while ( this.IsPortOpen )
 					{
 						setImmediate( () => this.process_next_message() );
 						// await process_next_message();
@@ -61,7 +68,7 @@ exports.DeferredServiceProvider =
 			ClosePort:
 				async function ClosePort()
 				{
-					this.is_port_open = false;
+					this.IsPortOpen = false;
 					let message_count = this.Messages.length;
 					if ( message_count > 0 )
 					{
@@ -106,12 +113,13 @@ exports.DeferredServiceProvider =
 
 			//---------------------------------------------------------------------
 			CallEndpoint:
-				async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback ) 
+				async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback = null ) 
 				{
 					// Validate that the endpoint exists.
 					if ( !this.Endpoints.EndpointExists( EndpointName ) )
 					{
 						throw new Error( `The endpoint [${EndpointName}] does not exist within [${this.ServiceName}].` );
+						return;
 					}
 					// Build the message.
 					let message =

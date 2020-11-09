@@ -4,6 +4,13 @@
 const LIB_ENDPOINTS_MANAGER = require( './EndpointsManager.js' );
 
 
+/*
+let Options =
+{
+};
+*/
+
+
 exports.ImmediateServiceProvider =
 	function ImmediateServiceProvider( ServiceName, Options )
 	{
@@ -14,7 +21,7 @@ exports.ImmediateServiceProvider =
 			ServiceName: ServiceName,
 			Options: Options,
 			Endpoints: LIB_ENDPOINTS_MANAGER.NewEndpoints(),
-			is_port_open: false,
+			IsPortOpen: false,
 
 
 			//---------------------------------------------------------------------
@@ -22,7 +29,7 @@ exports.ImmediateServiceProvider =
 			OpenPort:
 				async function OpenPort()
 				{
-					this.is_port_open = true;
+					this.IsPortOpen = true;
 					return;
 				},
 
@@ -32,7 +39,7 @@ exports.ImmediateServiceProvider =
 			ClosePort:
 				async function ClosePort()
 				{
-					this.is_port_open = false;
+					this.IsPortOpen = false;
 					return;
 				},
 
@@ -67,23 +74,24 @@ exports.ImmediateServiceProvider =
 
 			//---------------------------------------------------------------------
 			CallEndpoint:
-				async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback ) 
+				async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback = null ) 
 				{
 					// Validate that the endpoint exists.
 					if ( !this.Endpoints.EndpointExists( EndpointName ) )
 					{
 						throw new Error( `The endpoint [${EndpointName}] does not exist within [${this.ServiceName}].` );
+						return;
 					}
 					// Invoke the endpoint.
 					try
 					{
 						// let result = await this.Endpoints[ EndpointName ].Handler( CommandParameters );
 						let result = await this.Endpoints.HandleEndpoint( EndpointName, CommandParameters );
-						ReplyCallback( null, result );
+						if ( ReplyCallback ) { ReplyCallback( null, result ); }
 					}
 					catch ( error )
 					{
-						ReplyCallback( error, null );
+						if ( ReplyCallback ) { ReplyCallback( error, null ); }
 					}
 					// Return, OK.
 					return;

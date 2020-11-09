@@ -33,7 +33,7 @@ exports.TortoiseServiceProvider =
 
 
 			//---------------------------------------------------------------------
-			is_port_open: false,
+			IsPortOpen: false,
 
 
 			//---------------------------------------------------------------------
@@ -44,7 +44,7 @@ exports.TortoiseServiceProvider =
 					this.QueueClient = new LIB_TORTOISE(
 						this.Options.server,
 						this.Options.connect_options );
-					this.is_port_open = true;
+					this.IsPortOpen = true;
 					return;
 				},
 
@@ -55,7 +55,7 @@ exports.TortoiseServiceProvider =
 				async function ClosePort()
 				{
 					// this.QueueClient.close();
-					this.is_port_open = false;
+					this.IsPortOpen = false;
 					let message_count = this.Messages.length;
 					if ( message_count > 0 )
 					{

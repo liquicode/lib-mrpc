@@ -6,6 +6,7 @@ evolution and scalability of complex systems.
 
 This library allows you to define a number of specific commands (`Endpoints`) that can be
 invoked, regardless of location, using a transport abstraction (`ServiceProvider`).
+An `Endpoint` represents a function that does specific work for an application.
 
 By abstracting the transport layer of the RPC, an application gains a great deal
 of flexibility with regards to the way it can be developed and deployed.
@@ -65,6 +66,9 @@ Local service providers may store `Endpoints` within a different process as the 
 but transport messages (requests and replies) using local system resources.
 
 - `FileSystemServiceProvider`: 
+- `CommandLineServiceProvider`: 
+- `ClusterServiceProvider`: 
+- `ChildProcessServiceProvider`: 
 
 
 ## Remote Service Provders
@@ -73,10 +77,54 @@ Remote service providers may store code on a different machine from the calling 
 In many instances, these service providers require the inclusion of third-party libraries to implement the
 underlying transport mechanism.
 
+- `HttpServiceProvider`:
+- `SocketIOServiceProvider`:
 - `AmqpLibServiceProvider`:
 	Service `Endpoints` are invoked remotely via a message queue supporting the [amqp](https://www.amqp.org/) v0.9.1 protocol.
 	Requires the [amqplib/amqp.node](https://github.com/squaremo/amqp.node) third-party library.
 	Tested with [RabbitMQ](https://www.rabbitmq.com/).
+
+
+## The Service Provider Interface
+
+`function ...ServiceProvider( ServiceName, Options )`
+
+- Constructor function of a Service Provider implementation.
+- Returns a newly created instance of the requested service provider.
+- `ServiceName`: A name for the service, shared by `Endpoint` code and calling code.
+- `Options`: Service provider specific options. e.g. connection info, etc.
+
+
+`async function OpenPort()`
+
+- Performs any work needed to initialize the transport mechanism and begin receiving requests.
+
+
+`async function ClosePort()`
+
+- Shuts down any transport mechanisms in place and releases any remaining resources.
+
+
+`async function AddEndpoint( EndpointName, CommandFunction )`
+
+- Used by "server" code to host `Endpoints`.
+- `EndpointName`: The unique name of this endpoint within this service.
+- `CommandFunction`: The function to execute when this endpoint is called.
+
+
+`async function DestroyEndpoint( EndpointName )`
+
+- Removes an endpoint from this service.
+
+
+`async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback = null )`
+
+- Used to invoke an `Endpoint` by the (client) calling code.
+- `EndpointName`: The name of the endpoint on this service to call.
+- `CommandParameters`: The parameters to pass to this endpoint.
+- `ReplyCallback`: The function to execute when the reply from the endpoint has been received.
+	If this is `null`, then no reply will be waited for and the function will return as soon
+	as the message has been sent.
 
 
 # Endpoints
