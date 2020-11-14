@@ -1,284 +1,35 @@
-<!doctype html>
-<!--[if lt IE 7]>
-<html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>
-<html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>
-<html lang="en" ng-app="myApp" class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html lang="en" class="no-js">
-<!--<![endif]-->
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html>
+
+<!-- Configuration from: http://docsify.js.org -->
 
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Docs</title>
-	<meta name="description" content="Docs">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-
-	<!-- 
-	<link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.css">
-	<link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.css">
-	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
-	-->
-
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-		integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-		integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.9.0/loading-bar.min.css"
-		integrity="sha512-04BoiZDKe+eOvj+J105JtXWUn8XHNWujY0qV9WqIUPlJVUuumKHn2Sgz4/g3LLKCfSJo6tBuHDR/oVAEfOupxw=="
-		crossorigin="anonymous" />
-
-	<link rel="stylesheet" href="/main.css">
-
-	<!-- <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"> -->
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/flatly/bootstrap.min.css" SameSite="Secure">
-	<!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/materia/bootstrap.min.css" SameSite="Secure"> -->
-	<!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/darkly/bootstrap.min.css" SameSite="Secure"> -->
-
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
+	<!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/buble.css"> -->
+	<!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/dark.css"> -->
+	<!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/pure.css"> -->
 </head>
 
-<body ng-app="app">
-
-	<!-- 
-		=====================================================================
-		=====================================================================
-
-			JAVASCRIPT
-		
-		=====================================================================
-		=====================================================================
-	-->
-
-	<!-- jQuery + Bootstrap (FROM: https://getbootstrap.com/) -->
-	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-		crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
-		integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
-		crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
-		integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
-		crossorigin="anonymous"></script>
-
-	<!-- AngularJS -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.0/angular.min.js"
-		integrity="sha512-jiG+LwJB0bmXdn4byKzWH6whPpnLy1pnGA/p3VCXFLk4IJ/Ftfcb22katPTapt35Q6kwrlnRheK6UPOIdJhYTA=="
-		crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/angular-loader@1.8.0/angular-loader.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.9.0/loading-bar.min.js"
-		integrity="sha512-tiBCUuWu85GIKbCWEX2Vni8eqiIJQPsVrPFv2UZ8KFha3LPWxWit23smBsTJ2ZxqN7s5TIZ7uZn6kZL3LPyjPA=="
-		crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-cookie/4.1.0/angular-cookie.min.js"
-		integrity="sha512-AwGvEVn7ydY38OsMnbDomVctq/kE/0MpBrRuGsPB0MmXNRmulhvGlGkgBQI39pMdETj5yaDDFFcHnhu+lbXDxQ=="
-		crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/angular-sanitize@1.8.0/angular-sanitize.min.js"></script>
-
-	<!-- Libraries -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.6/showdown.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/ng-showdown/1.1.0/ng-showdown.min.js"></script>
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script> -->
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-highlightjs/0.7.1/angular-highlightjs.min.js"></script> -->
-
-	<!-- Application -->
-	<script src="/app.js"></script>
-	<script src="/main.js"></script>
-
-	<!--[if lt IE 7]>
-		<p class="browsehappy">
-			You are using an <strong>outdated</strong> browser.
-			Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
-		</p>
-	<![endif]-->
-
-
-	<!-- 
-		=====================================================================
-		=====================================================================
-
-			PAGE CONTENT
-
-		=====================================================================
-		=====================================================================
-	-->
-
-	<div ng-controller="main_controller" ng-cloak>
-
-		<!-- Navbar -->
-		<nav class="navbar border rounded bg-info navbar-dark navbar-expand-sm">
-			<!-- Navbar Brand -->
-			<a class="navbar-brand" href="/">
-				<img alt="" src="/banner.png">
-			</a>
-			<!-- Navbar Expand/Collapse Toggle -->
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-content"
-				aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
-				<i class="fa fa-bars"></i>
-			</button>
-			<!-- Navbar Content -->
-			<div class="collapse navbar-collapse" id="navbar-content">
-				<ul class="navbar-nav mr-auto">
-
-					<!-- Home -->
-					<li class="nav-item">
-						<a class="nav-link" href="#" ng-click="select_page( 'home' )">
-							Home
-						</a>
-					</li>
-
-					<!-- Categories -->
-					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="navbar-reference-dropdown" role="button"
-							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							Docs
-						</a>
-						<div class="dropdown-menu" aria-labelledby="navbar-reference-dropdown">
-							<a class="dropdown-item" href="#" ng-repeat="category in doc.Categories"
-								ng-click="select_page( 'Docs/' + category.name )">
-								{{ category.name }}
-							</a>
-						</div>
-					</li>
-
-					<!-- Reference -->
-					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="navbar-reference-dropdown" role="button"
-							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							Reference
-						</a>
-						<div class="dropdown-menu" aria-labelledby="navbar-reference-dropdown">
-							<a class="dropdown-item" href="#" ng-show="doc.Reference.Objects.length"
-								ng-click="select_page( 'Reference/Objects' )">
-								Objects
-							</a>
-							<a class="dropdown-item" href="#" ng-show="doc.Reference.Functions.length"
-								ng-click="select_page( 'Reference/Functions' )">
-								Functions
-							</a>
-							<a class="dropdown-item" href="#" ng-show="doc.Reference.Constants.length"
-								ng-click="select_page( 'Reference/Constants' )">
-								Constants
-							</a>
-						</div>
-					</li>
-
-				</ul>
-			</div>
-		</nav>
-
-		<!-- Error Display -->
-		<div class="row" ng-show="service_error">
-			<h5 class="text-danger">{{ service_error }}</h5>
-		</div>
-
-		<!-- Current Page -->
-		<div class="container-fluid" ng-show="page">
-
-			<div class="">
-				<h3>{{ page.name }}</h3>
-			</div>
-
-			<div ng-repeat="section in page.sections">
-
-				<!-- Section: Home -->
-				<div class="" ng-show="section.type === 'home'">
-					<h5>{{ section.project_name }}</h5>
-					<hr>
-					<div><strong>Version: </strong><span>{{ section.project_version }}</span></div>
-					<div><strong>Source code: </strong><a target="_blank"
-							href="{{ section.project_sourcecode }}">{{ section.project_sourcecode }}</a></div>
-					<div><strong>Homepage: </strong><a target="_blank"
-							href="{{ section.project_homepage }}">{{ section.project_homepage }}</a></div>
-					<hr>
-					<!-- <p ng-bind-html="section.description | markdown"></p> -->
-					<p markdown-to-html="section.description"></p>
-				</div>
-
-				<!-- Section: Narrative -->
-				<div ng-show="section.type === 'narrative'">
-					<p markdown-to-html="section.description"></p>
-				</div>
-
-				<!-- Section: Objects -->
-				<div class="container rounded" ng-show="section.type === 'object'">
-					<small>Object</small>
-					<h5>{{ section.name }}</h5>
-					<p markdown-to-html="section.description"></p>
-				</div>
-
-				<!-- Section: Functions -->
-				<div class="container rounded" ng-show="section.type === 'function'">
-					<small>Function</small>
-					<h5>{{ section.name }}</h5>
-					<hr>
-					<!-- <p ng-bind-html="section.description | markdown"></p> -->
-					<p markdown-to-html="section.description"></p>
-					<div ng-show="section.parameters">
-						<strong>Parameters:</strong>
-						<table class="table">
-							<thead>
-								<tr>
-									<th>Name</th>
-									<th>Type</th>
-									<th>Req'd</th>
-									<th>Description</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr ng-repeat="parameter in section.parameters">
-									<td>{{ parameter.name }}</td>
-									<td>{{ parameter.type }}</td>
-									<td>{{ parameter.reqd }}</td>
-									<td>{{ parameter.desc }}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<div ng-show="section.returns">
-						<strong>Returns:</strong>
-						<table class="table">
-							<thead>
-								<tr>
-									<th>Name</th>
-									<th>Type</th>
-									<th>Description</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr ng-repeat="return in section.returns">
-									<td>{{ return.name }}</td>
-									<td>{{ return.type }}</td>
-									<td>{{ return.desc }}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-
-				<!-- Section: Constants -->
-				<div class="container rounded" ng-show="section.type === 'constant'">
-					<small>Constant</small>
-					<h5>{{ section.name }}</h5>
-					<p markdown-to-html="section.description"></p>
-				</div>
-
-			</div>
-
-
-		</div> <!-- Container -->
-
-		<hr>
-		<div class="footer">
-			<div class="container">
-				<span class="text-info pull-right"><small><i>© 2020 Andre' G. Bowlin</i></small></span>
-			</div>
-		</div>
-		<br>
-		<br>
-
-	</div> <!-- controller="main_controller" -->
-
+<body>
+	<div id="app"></div>
+	<script>
+		window.$docsify = {
+			coverpage: true,
+			loadSidebar: true,
+			subMaxLevel: 2,
+			homepage: 'guides/readme.md',
+			// logo: 'media/lib-json.png',
+			name: 'lib-mrpc',
+		}
+	</script>
+	<script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
+	<script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-bash.min.js"></script>
+	<script src="//cdn.jsdelivr.net/npm/docsify-copy-code"></script>
 </body>
 
 </html>
