@@ -1,0 +1,150 @@
+
+
+/*---------------------------------------------
+	Box
+---------------------------------------------*/
+
+.box {
+  color: #fe33ac;
+  border-color: #fdcdea;
+}
+.box div {
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+
+/*---------------------------------------------
+	Special Effects
+---------------------------------------------*/
+
+.rounded {
+	border-radius: 10px 10px 10px 10px;
+	-moz-border-radius: 10px 10px 10px 10px;
+	-webkit-border-radius: 10px 10px 10px 10px;
+	border: 1px solid #000000;
+	padding: 10px 10px 5px 10px;
+	margin: 15px 0px 15px 0px;
+}
+
+.outer-shadow {
+	-moz-box-shadow: 3px 3px 5px 6px #ccc;
+	-webkit-box-shadow: 3px 3px 5px 6px #ccc;
+	box-shadow: 3px 3px 5px 6px #ccc;
+}
+
+.inner-shadow {
+	-moz-box-shadow: inset 0 0 10px #000000;
+	-webkit-box-shadow: inset 0 0 10px #000000;
+	box-shadow: inset 0 0 10px #000000;
+}
+
+.bottom-edge-shadow {
+	-webkit-box-shadow: 0 8px 6px -6px black;
+	-moz-box-shadow: 0 8px 6px -6px black;
+	box-shadow: 0 8px 6px -6px black;
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+
+
+.row-eq-height {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+}
+
+
+/*---------------------------------------------
+	All Links
+---------------------------------------------*/
+
+a {
+	cursor: pointer;
+}
+
+
+/*---------------------------------------------
+	Code Blocks
+---------------------------------------------*/
+
+pre
+{
+	padding: 5px;
+	border: 1px solid #AEB6BF;
+	background-color: #FCF3CF;
+}
+
+/*---------------------------------------------
+	Table Layout
+---------------------------------------------*/
+
+table.table-layout
+{
+	border-collapse: collapse;
+	border: 0px solid black;
+	width: 100%;
+}
+
+table.table-layout th
+{
+	text-align: left;
+	vertical-align: top;
+	/* font-size: smaller; */
+	/* border: solid 1px black; */
+}
+
+table.table-layout td
+{
+	text-align: left;
+	vertical-align: top;
+	white-space: nowrap;
+	/* font-size: smaller; */
+	/* border: solid 1px black; */
+}
+
+
+/*---------------------------------------------
+	Body Styles
+---------------------------------------------*/
+
+body, html
+{
+	height: 100%;
+}
+
+
+.body-image-container
+{
+	height: 100%;
+}
+
+
+.body-image
+{
+	background-image: url("/background.png"); /* The image used */
+	background-color: #ffffff; /* Used if the image is unavailable */
+	background-position: center; /* Center the image */
+	background-repeat: no-repeat; /* Do not repeat the image */
+	background-size: cover; /* Resize the background image to cover the entire container */
+	height: 100%; /* You must set a specified height */
+}
+
+
+/*---------------------------------------------
+	UI Elements
+---------------------------------------------*/
+
+.database-item
+{
+	background-color: rgba(12, 64, 133, 0.05);
+}
+
+.search-item
+{
+	background-color: rgba(12, 64, 133, 0.15);
+}
+

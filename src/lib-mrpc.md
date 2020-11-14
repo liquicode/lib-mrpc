@@ -1,6 +1,8 @@
 
 # lib-mrpc
 
+## Overview
+
 A transport agnostic message based remote procedure call library designed to facilitate the
 evolution and scalability of complex systems.
 
@@ -32,18 +34,22 @@ and construct a development environment where everything runs locally within the
 process. This same code can also become a distributed system when deployed into production.
 
 
-# Service Providers
+## Service Providers
 
 `lib-mrpc` offers a number of different `ServiceProvider` implementations.
 Implementations can store and execute `Endpoints` in many different ways.
 There are three categories of service provider which group implementations according to how and
 where `Endpoints` are executed:
+
 - Native Service Providers: `Endpoints` execute within the same process as the calling code.
+	The "server" code and the "client" code always share the same instance.
 - Local Service Providers: `Endpoints` execute on the same machine as the calling code.
+	The "server" code and the "client" code may share the same instance.
 - Remote Service Providers: `Endpoints` execute on a different machine as the calling code.
+	The "server" code and the "client" code may share the same instance.
 
 
-## Native Service Provders
+### Native Service Provders
 
 Native service providers store `Endpoints` within the same process as the calling code.
 When an endpoint is called, it will run within the same process.
@@ -60,7 +66,7 @@ When an endpoint is called, it will run within the same process.
 	This provider does present a full asynchronous and multi-threaded solution.
 
 
-## Local Service Provders
+### Local Service Provders
 
 Local service providers may store `Endpoints` within a different process as the calling code,
 but transport messages (requests and replies) using local system resources.
@@ -71,7 +77,7 @@ but transport messages (requests and replies) using local system resources.
 - `ChildProcessServiceProvider`: 
 
 
-## Remote Service Provders
+### Remote Service Provders
 
 Remote service providers may store code on a different machine from the calling code.
 In many instances, these service providers require the inclusion of third-party libraries to implement the
@@ -85,105 +91,7 @@ underlying transport mechanism.
 	Tested with [RabbitMQ](https://www.rabbitmq.com/).
 
 
-## The Service Provider Interface
-
-`function ...ServiceProvider( ServiceName, Options )`
-
-- Constructor function of a Service Provider implementation.
-- Returns a newly created instance of the requested service provider.
-- `ServiceName`: A name for the service, shared by `Endpoint` code and calling code.
-- `Options`: Service provider specific options. e.g. connection info, etc.
-
-
-`async function OpenPort()`
-
-- Performs any work needed to initialize the transport mechanism and begin receiving requests.
-
-
-`async function ClosePort()`
-
-- Shuts down any transport mechanisms in place and releases any remaining resources.
-
-
-`async function AddEndpoint( EndpointName, CommandFunction )`
-
-- Used by "server" code to host `Endpoints`.
-- `EndpointName`: The unique name of this endpoint within this service.
-- `CommandFunction`: The function to execute when this endpoint is called.
-
-
-`async function DestroyEndpoint( EndpointName )`
-
-- Removes an endpoint from this service.
-
-
-`async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback = null )`
-
-- Used to invoke an `Endpoint` by the (client) calling code.
-- `EndpointName`: The name of the endpoint on this service to call.
-- `CommandParameters`: The parameters to pass to this endpoint.
-- `ReplyCallback`: The function to execute when the reply from the endpoint has been received.
-	If this is `null`, then no reply will be waited for and the function will return as soon
-	as the message has been sent.
-
-
-# Endpoints
-
-An `Endpoint` represents a function that does specific work for an application.
-
-
----------------------------------------------------------------------
-
-# ***Deprecated Documentation:***
-
-## Channels and Channel Providers
-
-A `Channel` is an abstraction of the transport layer in a remote procedure call.
-A `ChannelProvider` is responsible for implementing the `Channel` that is used for this communication.
-It transports function parameters and return values between the caller and the function implementation.
-
-
-### Types of Channel Providers
-
-- `MemoryChannel`: Allows direct access to `Endpoints`.
-	Useful for prototyping and debugging.
-- `ThreadChannel`: `Endpoints` are run on seperate threads.
-	This transport allows you to deploy a truly multi-threaded Node.js application.
-- `ProcessChannel`: `Endpoints` are run in child processes.
-	For when a task needs its own entire Node.js process.
-	This may be needed if your `Endpoint` depends on external libraries.
-- `FileChannel`: `Endpoints` run in different Node.js instances and communicate via the file system.
-	This is useful for communication between different applications.
-- `HttpChannel`: Each `Endpoint` is exposed as an http web-service endpoint.
-	Traditional client-server applications will often use this type of transport.
-- `WebSocketChannel`: Each `Endpoint` is exposed as a web-socket endpoint.
-	An alternative to the http web-socket `Endpoint`.
-- `StompChannel`: `Endpoints` are accessible via a message queue.
-	`Endpoints` can be run anwhere that is accessible to any message queue system that uses the STOMP protocol.
-	Such as ActiveMQ, RabbitMQ, etc.
-- `SmtpChannel`: 
-- `AwsLambdaChannel`: (?) An `Endpoint` is implemented as an AWS Lambda function.
-	The `ChannelProvider` is responsible for creating and destroying the AWS Lamda.
-
-
-## API
-
-- ChannelProvider.NewEndpoint( EndpointName, CommandFunction )
-	// EndpointName <string>: Unique name of this endpoint.
-	// CommandFunction <function>: Function to be executed at this endpoint.
-
-- ChannelProvider.DestroyEndpoint( EndpointName )
-
-- Promise = CallEndpoint( EndpointName, CommandParameters )
-	// EndpointName <string>: Name of the endpoint to call.
-	// CommandParameters <object>: Parameters for the CommandFunction at this endpoint.
-	// Promise <Promise>: Returns a promise that resolves to the return value of the CommandFunction.
-
-
----------------------------------------------------------------------
-
-
-### `ServiceClient`
+## ServiceClient
 
 - A client to manage and invoke remote services.
 - object `Services` : Stores connections to remote services.
@@ -199,29 +107,6 @@ It transports function parameters and return values between the caller and the f
 	- string `EndpointName` : The name of the endpoint within the service.
 	- object `CommandParameters` : The parameters to pass to the endpoint function.
 	- function `ReplyCallback` : The callback function used to report endpoint results.
-
-### `ServiceProvider`
-
-- A transport-specific provider.
-- string `ServiceName` : The unique name of this service.
-- object `Endpoints` : A map of named endpoints available via this service.
-- async function `OpenPort()`
-	- Perform any work needed to start accepting requests for endpoints.
-- async function `ClosePort()`
-	- Stop listening for requests and free up related resources.
-- async function `AddEndpoint( EndpointName, CommandFunction )`
-	- Add a callable endpoint to the service.
-	- string `EndpointName` : The name of the endpoint within this service.
-	- async function `CommandFunction` : 
-- async function `DestroyEndpoint( EndpointName )`
-	- Remove an endpoint from the service.
-	- string `EndpointName` : The name of the endpoint within this service.
-- async function `CallEndpoint( EndpointName, CommandParameters, ReplyCallback )`
-	- Invoked by a client to execute an endpoint in this service.
-	- string `EndpointName` : The name of the endpoint within this service.
-	- object `CommandParameters` : The parameters to pass to the endpoint function.
-	- [async] function `ReplyCallback` : The callback function used to report endpoint results.
-
 
 
 ## Resources

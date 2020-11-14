@@ -1,7 +1,7 @@
 'use strict';
 
 
-const LIB_MRPC = require( '../lib-mrpc/lib-mrpc.js' );
+const LIB_MRPC = require( '../../src/lib-mrpc.js' );
 
 const MULTIPLIER_SERVICE_NAME = 'test.multiplier';
 
@@ -126,9 +126,9 @@ async function create_multiplication_table( ServiceClient, Size )
 
 ( async () =>
 {
-	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).ImmediateMultiplierService();
+	let multiplier_service = await require( './MultiplierServiceFactory.js' ).ImmediateMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).DeferredMultiplierService();
-	let multiplier_service = await require( './MultiplierServiceFactory.js' ).WorkerThreadMultiplierService();
+	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).WorkerThreadMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).StompMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).TortoiseMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).AmqpLibMultiplierService();
