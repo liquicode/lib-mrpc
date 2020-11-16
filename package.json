@@ -63,6 +63,7 @@
   },
   "scripts": {
     "run-tests": "mocha -u bdd tests --timeout 0 --slow 0 --colors",
+    "update-docs": "bash build/docs/update-docs.sh",
     "run-docs-web-server": "npx here --directory docs --port 4200 --watch 1 --silent",
     "010-webpack": "bash build/webpack/010-webpack.sh",
     "020-gen-lib-docs": "node build/docs/020-gen-lib-docs.js ./docs ./src ./tests",
