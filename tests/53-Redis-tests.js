@@ -2,14 +2,14 @@
 
 
 const LIB_MRPC = require( '../src/lib-mrpc.js' );
-const LIB_TORTOISE = require( '../src/TortoiseServiceProvider.js' );
+const LIB_REDIS = require( '../src/RedisServiceProvider.js' );
 const LIB_ASSERT = require( 'assert' );
 
 var TestService = null;
 var TestClient = null;
 
 //---------------------------------------------------------------------
-describe( `52) Tortoise Tests`,
+describe( `53) Redis Tests`,
 	function ()
 	{
 
@@ -17,7 +17,7 @@ describe( `52) Tortoise Tests`,
 		beforeEach(
 			async function ()
 			{
-				TestService = LIB_TORTOISE.TortoiseServiceProvider( 'Test Service' );
+				TestService = LIB_REDIS.RedisServiceProvider( 'Test Service' );
 				await TestService.OpenPort();
 				// For remote ServiceProviders, client and service may share the same instance.
 				TestClient = TestService;
@@ -45,7 +45,7 @@ describe( `52) Tortoise Tests`,
 					run_tests,
 				} = require( './services/echo.js' );
 				await install_service_endpoints( TestService );
-				await run_tests( TestClient, { iterations: 100 } );
+				await run_tests( TestClient, { iterations: 1000 } );
 				return;
 			} );
 

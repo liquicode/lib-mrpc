@@ -1,5 +1,6 @@
 'use strict';
 
+
 const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
 
 
@@ -8,6 +9,10 @@ function ImmediateServiceProvider( ServiceName, Options )
 
 	//---------------------------------------------------------------------
 	let service = LIB_SERVICE_PROVIDER.ServiceProvider( ServiceName, Options );
+
+
+	//---------------------------------------------------------------------
+	service.DefaultOptions = () => { return {}; };
 
 
 	//---------------------------------------------------------------------

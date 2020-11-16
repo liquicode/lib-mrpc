@@ -2,11 +2,14 @@
 
 
 const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
-const LIB_TORTOISE = require( 'tortoise' );
+const LIB_REDIS = require( 'redis' );
 const LIB_UNIQID = require( 'uniqid' );
 
+/*
+	[node_redis/node-redis](https://www.npmjs.com/package/redis)
+*/
 
-function TortoiseServiceProvider( ServiceName, Options )
+function RedisServiceProvider( ServiceName, Options )
 {
 
 	//---------------------------------------------------------------------
@@ -14,7 +17,7 @@ function TortoiseServiceProvider( ServiceName, Options )
 
 
 	//---------------------------------------------------------------------
-	service.QueueClient = null;
+	// service.RedisClient = null;
 
 
 	//---------------------------------------------------------------------
@@ -22,24 +25,10 @@ function TortoiseServiceProvider( ServiceName, Options )
 		() =>
 		{
 			return {
-				server: 'amqp://guest:guest@localhost:5672',
-				connect_options:
-				{
-					connectRetries: 30,
-					connectRetryInterval: 1000,
-				},
-				command_queue_options:
-				{
-					exclusive: false,
-					durable: false,
-					autoDelete: true,
-				},
-				reply_queue_options:
-				{
-					exclusive: false,
-					durable: false,
-					autoDelete: true,
-				},
+				host: null,
+				port: null,
+				path: null,
+				url: 'redis://localhost:6379',
 			};
 		};
 
@@ -51,9 +40,6 @@ function TortoiseServiceProvider( ServiceName, Options )
 			return new Promise(
 				async ( resolve, reject ) => 
 				{
-					service.QueueClient = new LIB_TORTOISE(
-						service.Options.server,
-						service.Options.connect_options );
 					service.IsPortOpen = true;
 					// Complete the function.
 					resolve( true );
@@ -74,14 +60,15 @@ function TortoiseServiceProvider( ServiceName, Options )
 					for ( let index = 0; index < keys.length; index++ )
 					{
 						let endpoint = service.EndpointManager.Endpoints[ keys[ index ] ];
-						await endpoint.Channel.close();
+						endpoint.Channel.unsubscribe();
+						endpoint.Channel.quit();
 					}
-					// Disconnect.
-					if ( service.QueueClient )
-					{
-						await service.QueueClient.destroy();
-						service.QueueClient = null;
-					}
+					// // Disconnect.
+					// if ( service.RedisClient )
+					// {
+					// 	await service.RedisClient.quit();
+					// 	service.RedisClient = null;
+					// }
 					service.IsPortOpen = false;
 					// Complete the function.
 					resolve( true );
@@ -104,33 +91,33 @@ function TortoiseServiceProvider( ServiceName, Options )
 						return;
 					}
 					// Subscribe to the message queue.
-					let channel = await service.QueueClient
-						.queue( `/queue/${service.ServiceName}/${EndpointName}`, service.Options.command_queue_options )
-						.prefetch( 1 )
-						.subscribe(
-							async function ( message, ack, nack )
+					let queue_name = `${service.ServiceName}/${EndpointName}`;
+					let channel = LIB_REDIS.createClient( service.Options );
+					channel.on( 'message',
+						async function ( channel, message )
+						{
+							try
 							{
-								try
+								let request = JSON.parse( message );
+								let result = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
+								if ( request.ReplyID )
 								{
-									let request = JSON.parse( message );
-									let result = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
-									if ( request.ReplyID )
-									{
-										await service.QueueClient
-											.queue( `/queue/${service.ServiceName}/${EndpointName}/${request.ReplyID}`, service.Options.reply_queue_options )
-											.publish( JSON.stringify( result ) );
-									}
-									ack();
+									let reply_queue_name = `${service.ServiceName}/${EndpointName}/${request.ReplyID}`;
+									let reply_channel = LIB_REDIS.createClient( service.Options );
+									reply_channel.publish( reply_queue_name, JSON.stringify( result ) );
+									reply_channel.quit();
 								}
-								catch ( error )
-								{
-									console.error( Error.message, error );
-									nack( false );
-								}
-								finally
-								{
-								}
-							} );
+							}
+							catch ( error )
+							{
+								console.error( Error.message, error );
+							}
+							finally
+							{
+							}
+							return;
+						} );
+					channel.subscribe( queue_name );
 					// Register the endpoint.
 					let endpoint = service.EndpointManager.AddEndpoint( EndpointName, CommandFunction );
 					endpoint.Channel = channel;
@@ -156,33 +143,34 @@ function TortoiseServiceProvider( ServiceName, Options )
 					}
 					// Setup the reply channel
 					let reply_id = LIB_UNIQID();
-					let channel = await service.QueueClient
-						.queue( `/queue/${service.ServiceName}/${EndpointName}/${reply_id}`, service.Options.reply_queue_options )
-						.prefetch( 1 )
-						.subscribe(
-							async function ( message, ack, nack )
+					let reply_queue_name = `${service.ServiceName}/${EndpointName}/${reply_id}`;
+					let reply_channel = LIB_REDIS.createClient( service.Options );
+					reply_channel.on( 'message',
+						function ( channel, message )
+						{
+							try
 							{
-								try
-								{
-									let reply = JSON.parse( message );
-									if ( CommandCallback ) { CommandCallback( null, reply ); }
-									ack();
-									// Complete the function.
-									resolve( reply );
-								}
-								catch ( error )
-								{
-									nack( false );
-									if ( CommandCallback ) { CommandCallback( error, null ); }
-									// Complete the function.
-									reject( error );
-								}
-								finally
-								{
-									await channel.close();
-								}
-								return;
-							} );
+								let reply = JSON.parse( message );
+								if ( CommandCallback ) { CommandCallback( null, reply ); }
+								// Complete the function.
+								resolve( reply );
+							}
+							catch ( error )
+							{
+								nack( false );
+								if ( CommandCallback ) { CommandCallback( error, null ); }
+								// Complete the function.
+								reject( error );
+							}
+							finally
+							{
+								reply_channel.unsubscribe();
+								reply_channel.quit();
+							}
+							return;
+							return;
+						} );
+					reply_channel.subscribe( reply_queue_name );
 					// Build the message.
 					let message =
 					{
@@ -191,9 +179,10 @@ function TortoiseServiceProvider( ServiceName, Options )
 						ReplyID: reply_id,
 					};
 					// Queue the message.
-					await service.QueueClient
-						.queue( `/queue/${service.ServiceName}/${EndpointName}`, service.Options.command_queue_options )
-						.publish( message );
+					let queue_name = `${service.ServiceName}/${EndpointName}`;
+					let channel = LIB_REDIS.createClient( service.Options );
+					channel.publish( queue_name, JSON.stringify( message ) );
+					channel.quit();
 				} );
 		};
 
@@ -204,5 +193,5 @@ function TortoiseServiceProvider( ServiceName, Options )
 };
 
 
-exports.TortoiseServiceProvider = TortoiseServiceProvider;
+exports.RedisServiceProvider = RedisServiceProvider;
 

@@ -17,16 +17,7 @@ describe( `51) AmqpLib Tests`,
 		beforeEach(
 			async function ()
 			{
-				let options =
-				{
-					server: 'amqp://guest:guest@localhost:5672',
-					connect_options:
-					{
-						connectRetries: 30,
-						connectRetryInterval: 1000,
-					},
-				};
-				TestService = LIB_AMQPLIB.AmqpLibServiceProvider( 'Test Service', options );
+				TestService = LIB_AMQPLIB.AmqpLibServiceProvider( 'Test Service' );
 				await TestService.OpenPort();
 				// For remote ServiceProviders, client and service may share the same instance.
 				TestClient = TestService;

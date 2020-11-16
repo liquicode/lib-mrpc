@@ -53,6 +53,7 @@
     "docdash": "^1.2.0",
     "jsdoc": "^3.6.6",
     "mocha": "^7.1.2",
+    "redis": "^3.0.2",
     "stompit": "^1.0.0",
     "tortoise": "^1.0.1",
     "uniqid": "^5.2.0",

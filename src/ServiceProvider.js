@@ -154,6 +154,40 @@ function ServiceProvider( ServiceName, Options )
 			},
 
 		//---------------------------------------------------------------------
+		ApplyDefaultOptions:
+			function ApplyDefaultOptions( UserOptions )
+			{
+				function apply_defaults( Options, Defaults )
+				{
+					let keys = Object.keys( Defaults );
+					for ( let index = 0; index < keys.length; index++ )
+					{
+						let key = keys[ index ];
+						if ( ( typeof Defaults[ key ] === 'object' ) && ( Defaults[ key ] !== null ) )
+						{
+							if ( typeof Options[ key ] === 'undefined' )
+							{
+								Options[ key ] = {};
+							}
+							apply_defaults( Options[ key ], Defaults[ key ] );
+						}
+						else if ( typeof Options[ key ] === 'undefined' )
+						{
+							Options[ key ] = Defaults[ key ];
+						}
+					}
+					return;
+				}
+				UserOptions = UserOptions || {};
+				let options = JSON.parse( JSON.stringify( UserOptions ) );
+				apply_defaults( options, this.DefaultOptions() );
+				return options;
+			},
+
+		//---------------------------------------------------------------------
+		DefaultOptions: function DefaultOptions() { throw new Error( `DefaultOptions is not implemented in ServiceProvider.` ); },
+
+		//---------------------------------------------------------------------
 		OpenPort: async function OpenPort() { throw new Error( `OpenPort is not implemented in ServiceProvider.` ); },
 
 		//---------------------------------------------------------------------

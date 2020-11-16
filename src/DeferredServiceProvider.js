@@ -1,5 +1,6 @@
 'use strict';
 
+
 const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
 
 
@@ -33,6 +34,10 @@ function DeferredServiceProvider( ServiceName, Options )
 			setImmediate( service.process_next_message );
 			return;
 		};
+
+
+	//---------------------------------------------------------------------
+	service.DefaultOptions = () => { return {}; };
 
 
 	//---------------------------------------------------------------------
