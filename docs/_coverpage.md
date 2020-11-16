@@ -4,7 +4,11 @@
 
 # lib-mrpc <small>0.0.1</small>
 
-> A replacment for JavaScript's standard JSON functions, and more!
+> A transport agnostic message based remote procedure call
+
+> library designed to facilitate the evolution and
+
+> scalability of complex systems.
 
 - Simple and lightweight (~10kB)
 - Minimal dependencies - Core is 100% JavaScript

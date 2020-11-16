@@ -47,10 +47,10 @@ where `Endpoints` are executed:
 	- `CommandFunction`: The function to execute when this endpoint is called.
 
 
-- `async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback = null )`
+- `async function CallEndpoint( EndpointName, CommandParameters, CommandCallback = null )`
 	- Used to invoke a (server) `Endpoint` by the (client) calling code.
 	- `EndpointName`: The name of the endpoint on this service to call.
 	- `CommandParameters`: The parameters to pass to this endpoint.
-	- `ReplyCallback`: The function to execute when the reply from the endpoint has been received.
+	- `CommandCallback`: The function to execute when the reply from the endpoint has been received.
 		If this is `null`, then no reply will be waited for and the function will return as soon
 		as the message has been sent.

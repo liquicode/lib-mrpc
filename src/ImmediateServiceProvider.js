@@ -12,53 +12,86 @@ function ImmediateServiceProvider( ServiceName, Options )
 
 	//---------------------------------------------------------------------
 	service.OpenPort =
-		async () => { service.IsPortOpen = true; };
+		async () =>
+		{
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					service.IsPortOpen = true;
+					// Complete the function.
+					resolve( true );
+					return;
+				} );
+		};
 
 
 	//---------------------------------------------------------------------
 	service.ClosePort =
-		async () => { service.IsPortOpen = false; };
+		async () =>
+		{
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					service.IsPortOpen = false;
+					// Complete the function.
+					resolve( true );
+					return;
+				} );
+		};
 
 
 	//---------------------------------------------------------------------
 	service.AddEndpoint =
 		async ( EndpointName, CommandFunction ) => 
 		{
-			// Make sure this endpoint doesn't already exist.
-			if ( service.EndpointManager.EndpointExists( EndpointName ) )
-			{
-				throw new Error( `The endpoint [${EndpointName}] already exists within [${service.ServiceName}].` );
-			}
-			// Register the endpoint.
-			let endpoint = service.EndpointManager.AddEndpoint( EndpointName, CommandFunction );
-			// Return, OK.
-			return;
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					// Make sure this endpoint doesn't already exist.
+					if ( service.EndpointManager.EndpointExists( EndpointName ) )
+					{
+						reject( new Error( `The endpoint [${EndpointName}] already exists within [${service.ServiceName}].` ) );
+						return;
+					}
+					// Register the endpoint.
+					let endpoint = service.EndpointManager.AddEndpoint( EndpointName, CommandFunction );
+					// Complete the function.
+					resolve( true );
+					return;
+				} );
 		};
 
 
 	//---------------------------------------------------------------------
 	service.CallEndpoint =
-		async function ( EndpointName, CommandParameters, ReplyCallback = null ) 
+		async function ( EndpointName, CommandParameters, CommandCallback = null ) 
 		{
-			// Validate that the endpoint exists.
-			if ( !service.EndpointManager.EndpointExists( EndpointName ) )
-			{
-				throw new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` );
-				return;
-			}
-			// Invoke the endpoint.
-			try
-			{
-				// let result = await this.Endpoints[ EndpointName ].Handler( CommandParameters );
-				let result = await service.EndpointManager.HandleEndpoint( EndpointName, CommandParameters );
-				if ( ReplyCallback ) { ReplyCallback( null, result ); }
-			}
-			catch ( error )
-			{
-				if ( ReplyCallback ) { ReplyCallback( error, null ); }
-			}
-			// Return, OK.
-			return;
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					// Validate that the endpoint exists.
+					if ( !service.EndpointManager.EndpointExists( EndpointName ) )
+					{
+						reject( new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` ) );
+						return;
+					}
+					// Invoke the endpoint.
+					try
+					{
+						let reply = await service.EndpointManager.HandleEndpoint( EndpointName, CommandParameters );
+						if ( CommandCallback ) { CommandCallback( null, reply ); }
+						// Complete the function.
+						resolve( reply );
+						return;
+					}
+					catch ( error )
+					{
+						if ( CommandCallback ) { CommandCallback( error, null ); }
+						// Complete the function.
+						reject( error );
+						return;
+					}
+				} );
 		};
 
 

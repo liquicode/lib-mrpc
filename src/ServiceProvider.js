@@ -40,6 +40,16 @@ function EndpointManager()
 			},
 
 		//---------------------------------------------------------------------
+		EachEndpoint:
+			function EachEndpoint( Iterator )
+			{
+				let keys = Object.keys( this.Endpoints );
+				keys.forEach( key => Iterator( this.Endpoints[ key ], key ) );
+				// for ( let endpoint in this.Endpoints ) { Iterator( endpoint ); }
+				return;
+			},
+
+		//---------------------------------------------------------------------
 		HandleEndpoint:
 			async function HandleEndpoint( EndpointName, Parameters )
 			{
@@ -113,6 +123,37 @@ function ServiceProvider( ServiceName, Options )
 		MessageManager: MessageManager(),
 
 		//---------------------------------------------------------------------
+		Sleep:
+			async function Sleep( Milliseconds )
+			{
+				return new Promise( resolve => setTimeout( resolve, Milliseconds ) );
+			},
+
+		//---------------------------------------------------------------------
+		WaitWhile:
+			async function WaitWhile( Condition )
+			{
+				return new Promise(
+					async ( resolve, reject ) => 
+					{
+						while ( Condition() ) { await this.Sleep( 1 ); }
+						resolve( true );
+					} );
+			},
+
+		//---------------------------------------------------------------------
+		WaitUntil:
+			async function WaitUntil( Condition )
+			{
+				return new Promise(
+					async ( resolve, reject ) => 
+					{
+						while ( !Condition() ) { await this.Sleep( 1 ); }
+						resolve( true );
+					} );
+			},
+
+		//---------------------------------------------------------------------
 		OpenPort: async function OpenPort() { throw new Error( `OpenPort is not implemented in ServiceProvider.` ); },
 
 		//---------------------------------------------------------------------
@@ -122,7 +163,7 @@ function ServiceProvider( ServiceName, Options )
 		AddEndpoint: async function AddEndpoint( EndpointName, CommandFunction ) { throw new Error( `AddEndpoint is not implemented in ServiceProvider.` ); },
 
 		//---------------------------------------------------------------------
-		CallEndpoint: async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback = null ) { throw new Error( `CallEndpoint is not implemented in ServiceProvider.` ); },
+		CallEndpoint: async function CallEndpoint( EndpointName, CommandParameters, CommandCallback = null ) { throw new Error( `CallEndpoint is not implemented in ServiceProvider.` ); },
 
 	};
 }

@@ -14,19 +14,23 @@ function DeferredServiceProvider( ServiceName, Options )
 	service.process_next_message =
 		async () =>
 		{
-			if ( !service.MessageManager.PeekMessage() ) { return; }
+			if ( !service.IsPortOpen ) { return; }
 			// Dequeue the next message.
 			let message = service.MessageManager.NextMessage();
-			// Invoke the endpoint.
-			try
+			if ( message ) 
 			{
-				let result = await service.EndpointManager.HandleEndpoint( message.EndpointName, message.CommandParameters );
-				if ( message.ReplyCallback ) { message.ReplyCallback( null, result ); }
+				// Invoke the endpoint.
+				try
+				{
+					let result = await service.EndpointManager.HandleEndpoint( message.EndpointName, message.CommandParameters );
+					if ( message.ReplyCallback ) { message.ReplyCallback( null, result ); }
+				}
+				catch ( error )
+				{
+					if ( message.ReplyCallback ) { message.ReplyCallback( error, null ); }
+				}
 			}
-			catch ( error )
-			{
-				if ( message.ReplyCallback ) { message.ReplyCallback( error, null ); }
-			}
+			setImmediate( service.process_next_message );
 			return;
 		};
 
@@ -36,14 +40,15 @@ function DeferredServiceProvider( ServiceName, Options )
 	service.OpenPort =
 		async () =>
 		{
-			service.IsPortOpen = true;
-			while ( service.IsPortOpen )
-			{
-				setImmediate( () => service.process_next_message() );
-				// await process_next_message();
-				await new Promise( resolve => setTimeout( resolve, 1 ) );
-			}
-			return;
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					service.IsPortOpen = true;
+					service.process_next_message();
+					// Complete the function.
+					resolve( true );
+					return;
+				} );
 		};
 
 
@@ -52,14 +57,20 @@ function DeferredServiceProvider( ServiceName, Options )
 	service.ClosePort =
 		async () =>
 		{
-			service.IsPortOpen = false;
-			let message_count = service.Messages.length;
-			if ( message_count > 0 )
-			{
-				// throw new Error( `There are still [${message_count}] messages left in the queue.` );
-				console.warn( `The port was closed but there are still [${message_count}] messages left in the queue.` );
-			}
-			return;
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					service.IsPortOpen = false;
+					let message_count = service.MessageManager.Messages.length;
+					if ( message_count > 0 )
+					{
+						// throw new Error( `There are still [${message_count}] messages left in the queue.` );
+						console.warn( `DeferredServiceProvider Warning: The port was closed but there are still [${message_count}] messages left in the queue.` );
+					}
+					// Complete the function.
+					resolve( true );
+					return;
+				} );
 		};
 
 
@@ -68,39 +79,54 @@ function DeferredServiceProvider( ServiceName, Options )
 	service.AddEndpoint =
 		async ( EndpointName, CommandFunction ) =>
 		{
-			// Make sure service endpoint doesn't already exist.
-			if ( service.EndpointManager.EndpointExists( EndpointName ) )
-			{
-				throw new Error( `The endpoint [${EndpointName}] already exists within [${service.ServiceName}].` );
-			}
-			// Register the endpoint.
-			let endpoint = service.EndpointManager.AddEndpoint( EndpointName, CommandFunction );
-			// Return, OK.
-			return;
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					// Make sure service endpoint doesn't already exist.
+					if ( service.EndpointManager.EndpointExists( EndpointName ) )
+					{
+						// Complete the function.
+						reject( new Error( `The endpoint [${EndpointName}] already exists within [${service.ServiceName}].` ) );
+						return;
+					}
+					// Register the endpoint.
+					let endpoint = service.EndpointManager.AddEndpoint( EndpointName, CommandFunction );
+					// Complete the function.
+					resolve( true );
+					return;
+				} );
 		};
 
 
 	//---------------------------------------------------------------------
 	service.CallEndpoint =
-		async ( EndpointName, CommandParameters, ReplyCallback = null ) =>
+		async ( EndpointName, CommandParameters, CommandCallback = null ) =>
 		{
-			// Validate that the endpoint exists.
-			if ( !service.EndpointManager.EndpointExists( EndpointName ) )
-			{
-				throw new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` );
-				return;
-			}
-			// Build the message.
-			let message =
-			{
-				EndpointName: EndpointName,
-				CommandParameters: CommandParameters,
-				ReplyCallback: ReplyCallback,
-			};
-			// Queue the message.
-			service.MessageManager.AddMessage( message );
-			// Return, OK.
-			return;
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					// Validate that the endpoint exists.
+					if ( !service.EndpointManager.EndpointExists( EndpointName ) )
+					{
+						reject( new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` ) );
+						return;
+					}
+					// Build the message.
+					let message =
+					{
+						EndpointName: EndpointName,
+						CommandParameters: CommandParameters,
+						ReplyCallback:
+							( error, reply ) =>
+							{
+								if ( CommandCallback ) { CommandCallback( error, reply ); }
+								if ( error ) { reject( error ); }
+								else { resolve( reply ); }
+							},
+					};
+					// Queue the message.
+					service.MessageManager.AddMessage( message );
+				} );
 		};
 
 

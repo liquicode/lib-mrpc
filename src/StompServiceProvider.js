@@ -51,11 +51,11 @@ exports.StompServiceProvider =
 			// 		try
 			// 		{
 			// 			let result = await this.Endpoints[ message.EndpointName ].Handler( message.CommandParameters );
-			// 			message.ReplyCallback( null, result );
+			// 			message.CommandCallback( null, result );
 			// 		}
 			// 		catch ( error )
 			// 		{
-			// 			message.ReplyCallback( error, null );
+			// 			message.CommandCallback( error, null );
 			// 		}
 			// 		return;
 			// 	},
@@ -162,7 +162,7 @@ exports.StompServiceProvider =
 
 			//---------------------------------------------------------------------
 			CallEndpoint:
-				async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback ) 
+				async function CallEndpoint( EndpointName, CommandParameters, CommandCallback ) 
 				{
 					// Validate that the endpoint exists.
 					if ( typeof this.Endpoints[ EndpointName ] === 'undefined' )
@@ -185,7 +185,7 @@ exports.StompServiceProvider =
 								{
 									if ( error ) { throw new Error( `Queue reply message read Error: ${error.message}` ); }
 									console.log( 'received reply message: ' + body );
-									ReplyCallback( null, body );
+									CommandCallback( null, body );
 									message.ack();
 								} );
 						} );
@@ -194,7 +194,7 @@ exports.StompServiceProvider =
 					{
 						EndpointName: EndpointName,
 						CommandParameters: CommandParameters,
-						ReplyCallback: reply_id,
+						CommandCallback: reply_id,
 					};
 					// Queue the message.
 					const sendHeaders = {

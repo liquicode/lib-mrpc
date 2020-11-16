@@ -1,17 +1,8 @@
 'use strict';
 
 const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
-
-
 const LIB_AMQPLIB = require( 'amqplib' );
-/*
-REFS:
-	https://github.com/squaremo/amqp.node
-	https://www.squaremobius.net/amqp.node/channel_api.html#overview
-*/
-
 const LIB_UNIQID = require( 'uniqid' );
-// const LIB_ENDPOINTS_MANAGER = require( './EndpointsManager.js' );
 
 /*
 let Options =
@@ -56,7 +47,7 @@ function AmqpLibServiceProvider( ServiceName, Options )
 		async () => 
 		{
 			let result_ok = null;
-			service.QueueClient = await LIB_AMQPLIB.connect( service.Options.server );
+			service.QueueClient = await LIB_AMQPLIB.connect( service.Options.server, service.Options.connect_options );
 			service.QueueChannel = await service.QueueClient.createChannel();
 			result_ok = await service.QueueChannel.prefetch( 1 );
 			service.IsPortOpen = true;
@@ -68,10 +59,51 @@ function AmqpLibServiceProvider( ServiceName, Options )
 	service.ClosePort =
 		async () => 
 		{
-			service.QueueChannel.close();
-			service.QueueClient.close();
-			service.QueueClient = null;
-			service.QueueChannel = null;
+			//NOTE: Due to some unexpected behavior in AmqpLib's shutdown process,
+			//		we do some sleeping to let everything settle before shutting down.
+			await service.Sleep( 1000 );
+			if ( service.QueueChannel )
+			{
+				// service.QueueChannel.on( 'error', ( error ) => console.error( 'AmqpLib ERROR: ' + error.message, error ) );
+				// let endpoints = service.EndpointManager.Endpoints;
+				// for ( let index = 0; index < endpoints.length; index++ )
+				// {
+				// 	let endpoint = endpoints[ index ];
+				// 	let queue_name = `${service.ServiceName}/${endpoint.EndpointName}`;
+				// 	await service.QueueChannel.deleteQueue( queue_name );
+				// }
+				// try
+				// {
+				// 	await service.QueueChannel.close()
+				// 		.catch( ( error ) =>
+				// 		{
+				// 			console.error( 'AmqpLib ERROR: ' + error.message, error );
+				// 		} );
+				// }
+				// catch ( error )
+				// {
+				// 	console.error( 'AmqpLib ERROR: ' + error.message, error );
+				// }
+				await service.QueueChannel.close();
+				service.QueueChannel = null;
+			}
+			if ( service.QueueClient )
+			{
+				// try
+				// {
+				// 	await service.QueueClient.close()
+				// 		.catch( ( error ) =>
+				// 		{
+				// 			console.error( 'AmqpLib ERROR: ' + error.message, error );
+				// 		} );
+				// }
+				// catch ( error )
+				// {
+				// 	console.error( 'AmqpLib ERROR: ' + error.message, error );
+				// }
+				await service.QueueClient.close();
+				service.QueueClient = null;
+			}
 			service.IsPortOpen = false;
 			return;
 		};
@@ -81,14 +113,14 @@ function AmqpLibServiceProvider( ServiceName, Options )
 	service.AddEndpoint =
 		async ( EndpointName, CommandFunction ) =>
 		{
+			let result_ok = null;
 			// Make sure this endpoint doesn't already exist.
 			if ( service.EndpointManager.EndpointExists( EndpointName ) )
 			{
 				throw new Error( `The endpoint [${EndpointName}] already exists within [${service.ServiceName}].` );
 			}
 			// Subscribe to the message queue.
-			let This = this;
-			let result_ok = null;
+			// let This = this;
 			let queue_name = `${service.ServiceName}/${EndpointName}`;
 			result_ok = await service.QueueChannel.assertQueue( queue_name, COMMAND_CHANNEL_OPTIONS );
 			result_ok = await service.QueueChannel.consume(
@@ -105,7 +137,7 @@ function AmqpLibServiceProvider( ServiceName, Options )
 						let message_string = message.content.toString();
 						// console.debug( `Command: ${message_string}` );
 						let reply = JSON.parse( message_string );
-						let reply_id = reply.ReplyCallback;
+						let reply_id = reply.CommandCallback;
 						let result = await service.EndpointManager.HandleEndpoint( reply.EndpointName, reply.CommandParameters );
 						if ( reply_id )
 						{
@@ -113,7 +145,7 @@ function AmqpLibServiceProvider( ServiceName, Options )
 							result_ok = service.QueueChannel.assertQueue( reply_queue_name, REPLY_CHANNEL_OPTIONS );
 							result_ok = service.QueueChannel.sendToQueue(
 								reply_queue_name,
-								new Buffer( JSON.stringify( result ) ),
+								Buffer.from( JSON.stringify( result ) ),
 								{
 									contentType: "text/plain",
 									// deliveryMode: 1,
@@ -141,8 +173,9 @@ function AmqpLibServiceProvider( ServiceName, Options )
 
 	//---------------------------------------------------------------------
 	service.CallEndpoint =
-		async ( EndpointName, CommandParameters, ReplyCallback = null ) =>
+		async ( EndpointName, CommandParameters, CommandCallback = null ) =>
 		{
+			let result_ok = null;
 			// Validate that the endpoint exists.
 			if ( !service.EndpointManager.EndpointExists( EndpointName ) )
 			{
@@ -150,10 +183,10 @@ function AmqpLibServiceProvider( ServiceName, Options )
 			}
 			// Setup the reply channel
 			let reply_id = null;
-			if ( ReplyCallback )
+			if ( CommandCallback )
 			{
 				reply_id = LIB_UNIQID();
-				let This = this;
+				// let This = this;
 				let result_ok = null;
 				let reply_queue_name = `${service.ServiceName}/${EndpointName}/${reply_id}`;
 				result_ok = await service.QueueChannel.assertQueue( reply_queue_name, REPLY_CHANNEL_OPTIONS );
@@ -171,12 +204,12 @@ function AmqpLibServiceProvider( ServiceName, Options )
 							let message_string = message.content.toString();
 							// console.debug( `Reply: ${message_string}` );
 							let reply = JSON.parse( message_string );
-							ReplyCallback( null, reply );
+							CommandCallback( null, reply );
 						}
 						catch ( error )
 						{
 							console.error( Error.message, error );
-							ReplyCallback( error, null );
+							CommandCallback( error, null );
 						}
 						finally
 						{
@@ -192,14 +225,14 @@ function AmqpLibServiceProvider( ServiceName, Options )
 			{
 				EndpointName: EndpointName,
 				CommandParameters: CommandParameters,
-				ReplyCallback: reply_id,
+				CommandCallback: reply_id,
 			};
 			// Queue the message.
 			let queue_name = `${service.ServiceName}/${EndpointName}`;
 			result_ok = await service.QueueChannel.assertQueue( queue_name, COMMAND_CHANNEL_OPTIONS );
 			result_ok = service.QueueChannel.sendToQueue(
 				queue_name,
-				new Buffer( JSON.stringify( message ) ),
+				Buffer.from( JSON.stringify( message ) ),
 				{
 					contentType: "text/plain",
 					// deliveryMode: 1,

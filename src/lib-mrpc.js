@@ -83,7 +83,7 @@ exports.ServiceClient =
 
 	//---------------------------------------------------------------------
 	CallEndpoint:
-		function CallEndpoint( ServiceName, EndpointName, CommandParameters, ReplyCallback ) 
+		function CallEndpoint( ServiceName, EndpointName, CommandParameters, CommandCallback ) 
 		{
 			// Validate that the service exists.
 			if ( typeof this.Services[ ServiceName ] === 'undefined' )
@@ -91,7 +91,7 @@ exports.ServiceClient =
 				throw new Error( `The service [${ServiceName}] does not exist.` );
 			}
 			// Invoke the endpoint.
-			this.Services[ ServiceName ].CallEndpoint( EndpointName, CommandParameters, ReplyCallback );
+			this.Services[ ServiceName ].CallEndpoint( EndpointName, CommandParameters, CommandCallback );
 			// Return, OK.
 			return;
 		},

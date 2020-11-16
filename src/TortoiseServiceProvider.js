@@ -1,85 +1,122 @@
 'use strict';
 
+const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
 
 const LIB_TORTOISE = require( 'tortoise' );
 const LIB_UNIQID = require( 'uniqid' );
 
 
-/*
-let Options =
+const DEFAULT_OPTIONS =
 {
-	server: 'localhost',
+	server: 'amqp://guest:guest@localhost:5672',
 	connect_options:
 	{
 		connectRetries: 30,
 		connectRetryInterval: 1000,
 	},
-};
-*/
-
-
-exports.TortoiseServiceProvider =
-	function TortoiseServiceProvider( ServiceName, Options )
+	command_queue_options:
 	{
-		return {
+		exclusive: false,
+		durable: false,
+		autoDelete: true,
+	},
+	reply_queue_options:
+	{
+		exclusive: false,
+		durable: false,
+		autoDelete: true,
+	},
+};
+
+function merge_from( Options, Defaults )
+{
+	let keys = Object.keys( Defaults );
+	for ( let index = 0; index < keys.length; index++ )
+	{
+		let key = keys[ index ];
+		if ( typeof Options[ key ] === 'undefined' )
+		{
+			Options[ key ] = Defaults[ key ];
+		}
+		else if ( typeof Options[ key ] === 'object' )
+		{
+			merge_from( Options[ key ], Defaults[ key ] );
+		}
+	}
+	return;
+}
+
+function TortoiseServiceProvider( ServiceName, Options )
+{
+
+	//---------------------------------------------------------------------
+	let service = LIB_SERVICE_PROVIDER.ServiceProvider( ServiceName, Options );
 
 
-			//---------------------------------------------------------------------
-			ServiceName: ServiceName,
-			Options: Options,
-			Endpoints: {},
-			QueueClient: null,
-			Messages: [],
+	//---------------------------------------------------------------------
+	service.QueueClient = null;
 
 
-			//---------------------------------------------------------------------
-			IsPortOpen: false,
-
-
-			//---------------------------------------------------------------------
-			// A service opens a port to listen for connections.
-			OpenPort:
-				async function OpenPort()
+	//---------------------------------------------------------------------
+	// A service opens a port to listen for connections.
+	service.OpenPort =
+		async () =>
+		{
+			return new Promise(
+				async ( resolve, reject ) => 
 				{
-					this.QueueClient = new LIB_TORTOISE(
-						this.Options.server,
-						this.Options.connect_options );
-					this.IsPortOpen = true;
+					service.Options = service.Options || DEFAULT_OPTIONS;
+					merge_from( service.Options, DEFAULT_OPTIONS );
+					service.QueueClient = new LIB_TORTOISE(
+						service.Options.server,
+						service.Options.connect_options );
+					service.IsPortOpen = true;
+					// Complete the function.
+					resolve( true );
 					return;
-				},
+				} );
+		};
 
 
-			//---------------------------------------------------------------------
-			// A service can close its port to stop listening for connections.
-			ClosePort:
-				async function ClosePort()
+	//---------------------------------------------------------------------
+	// A service can close its port to stop listening for connections.
+	service.ClosePort =
+		async () =>
+		{
+			return new Promise(
+				async ( resolve, reject ) => 
 				{
-					// this.QueueClient.close();
-					this.IsPortOpen = false;
-					let message_count = this.Messages.length;
-					if ( message_count > 0 )
+					let keys = Object.keys( service.EndpointManager.Endpoints );
+					for ( let index = 0; index < keys.length; index++ )
 					{
-						// throw new Error( `There are still [${message_count}] messages left in the queue.` );
-						console.warn( `The port was closed but there are still [${message_count}] messages left in the queue.` );
+						let endpoint = service.EndpointManager.Endpoints[ keys[ index ] ];
+						await endpoint.Channel.close();
 					}
+					await service.QueueClient.destroy();
+					service.IsPortOpen = false;
+					// Complete the function.
+					resolve( true );
 					return;
-				},
+				} );
+		};
 
 
-			//---------------------------------------------------------------------
-			// A service has endpoints which can be called.
-			AddEndpoint:
-				async function AddEndpoint( EndpointName, CommandFunction ) 
+	//---------------------------------------------------------------------
+	// A service has endpoints which can be called.
+	service.AddEndpoint =
+		async ( EndpointName, CommandFunction ) =>
+		{
+			return new Promise(
+				async ( resolve, reject ) => 
 				{
 					// Make sure this endpoint doesn't already exist.
-					if ( typeof this.Endpoints[ EndpointName ] !== 'undefined' )
+					if ( service.EndpointManager.EndpointExists( EndpointName ) )
 					{
-						throw new Error( `The endpoint [${EndpointName}] already exists within [${this.ServiceName}].` );
+						throw new Error( `The endpoint [${EndpointName}] already exists within [${service.ServiceName}].` );
 					}
 					// Subscribe to the message queue.
-					let This = this;
-					let channel = await this.QueueClient
-						.queue( `/queue/${this.ServiceName}/${EndpointName}`, { durable: true } )
+					let channel = await service.QueueClient
+						.queue( `/queue/${service.ServiceName}/${EndpointName}`, service.Options.command_queue_options )
 						.prefetch( 1 )
 						.subscribe(
 							async function ( message, ack, nack )
@@ -87,13 +124,13 @@ exports.TortoiseServiceProvider =
 								try
 								{
 									let request = JSON.parse( message );
-									let reply_id = request.ReplyCallback;
-									let result = CommandFunction( request.CommandParameters );
+									let reply_id = request.ReplyID;
+									let result = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
 									if ( reply_id )
 									{
-										await This.QueueClient
-											.queue( `/queue/${This.ServiceName}/${EndpointName}/${reply_id}`, { durable: true } )
-											.publish( result );
+										await service.QueueClient
+											.queue( `/queue/${service.ServiceName}/${EndpointName}/${reply_id}`, service.Options.reply_queue_options )
+											.publish( JSON.stringify( result ) );
 									}
 									ack();
 								}
@@ -107,86 +144,73 @@ exports.TortoiseServiceProvider =
 								}
 							} );
 					// Register the endpoint.
-					this.Endpoints[ EndpointName ] =
-					{
-						EndpointName: EndpointName,
-						Handler: CommandFunction,
-						Channel: channel,
-					};
-					// Return, OK.
+					let endpoint = service.EndpointManager.AddEndpoint( EndpointName, CommandFunction );
+					endpoint.Channel = channel;
+					// Complete the function.
+					resolve( true );
 					return;
-				},
+				} );
+		};
 
 
-			//---------------------------------------------------------------------
-			DestroyEndpoint:
-				async function DestroyEndpoint( EndpointName ) 
-				{
-					if ( typeof this.Endpoints[ EndpointName ] === 'undefined' ) { return; }
-					// Disconnect the subscription.
-					this.Endpoints[ EndpointName ].Subscription.unsubscribe();
-					// Deregister the endpoint.
-					delete this.Endpoints[ EndpointName ];
-					// Remove any messages destined for this endpoint.
-
-					//TODO:
-
-					// Return, OK.
-					return;
-				},
-
-
-			//---------------------------------------------------------------------
-			CallEndpoint:
-				async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback ) 
+	//---------------------------------------------------------------------
+	service.CallEndpoint =
+		async ( EndpointName, CommandParameters, CommandCallback ) =>
+		{
+			return new Promise(
+				async ( resolve, reject ) => 
 				{
 					// Validate that the endpoint exists.
-					if ( typeof this.Endpoints[ EndpointName ] === 'undefined' )
+					if ( !service.EndpointManager.EndpointExists( EndpointName ) )
 					{
-						throw new Error( `The endpoint [${EndpointName}] does not exist within [${this.ServiceName}].` );
+						throw new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` );
 					}
 					// Setup the reply channel
 					let reply_id = LIB_UNIQID();
-					let channel = await this.QueueClient
-						.queue( `/queue/${this.ServiceName}/${EndpointName}/${reply_id}`, { durable: true } )
+					let channel = await service.QueueClient
+						.queue( `/queue/${service.ServiceName}/${EndpointName}/${reply_id}`, service.Options.reply_queue_options )
 						.prefetch( 1 )
 						.subscribe(
 							async function ( message, ack, nack )
 							{
 								try
 								{
-									let request = JSON.parse( message );
-									ReplyCallback( null, request );
+									let reply = JSON.parse( message );
+									if ( CommandCallback ) { CommandCallback( null, reply ); }
 									ack();
+									// Complete the function.
+									resolve( reply );
 								}
 								catch ( error )
 								{
 									nack( false );
-									ReplyCallback( error, null );
+									if ( CommandCallback ) { CommandCallback( error, null ); }
+									// Complete the function.
+									reject( error );
 								}
 								finally
 								{
 									await channel.close();
 								}
+								return;
 							} );
 					// Build the message.
 					let message =
 					{
 						EndpointName: EndpointName,
 						CommandParameters: CommandParameters,
-						ReplyCallback: reply_id,
+						ReplyID: reply_id,
 					};
 					// Queue the message.
-					await this.QueueClient
-						.queue( `/queue/${this.ServiceName}/${EndpointName}`, { durable: true } )
-						.publish( message )
-						;
-					// Return, OK.
-					return;
-				},
-
+					await service.QueueClient
+						.queue( `/queue/${service.ServiceName}/${EndpointName}`, service.Options.command_queue_options )
+						.publish( message );
+				} );
 		};
-		return;
-	};
 
+	return service;
+};
+
+
+exports.TortoiseServiceProvider = TortoiseServiceProvider;
 

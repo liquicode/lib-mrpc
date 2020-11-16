@@ -51,8 +51,14 @@ function WorkerThreadServiceProvider( ServiceName, Options )
 	service.OpenPort =
 		async () =>
 		{
-			service.IsPortOpen = true;
-			return;
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					service.IsPortOpen = true;
+					// Complete the function.
+					resolve( true );
+					return;
+				} );
 		};
 
 
@@ -60,8 +66,14 @@ function WorkerThreadServiceProvider( ServiceName, Options )
 	service.ClosePort =
 		async () =>
 		{
-			service.IsPortOpen = false;
-			return;
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					service.IsPortOpen = false;
+					// Complete the function.
+					resolve( true );
+					return;
+				} );
 		};
 
 
@@ -69,83 +81,104 @@ function WorkerThreadServiceProvider( ServiceName, Options )
 	service.AddEndpoint =
 		async ( EndpointName, CommandFunction ) =>
 		{
-			// Make sure this endpoint doesn't already exist.
-			if ( service.EndpointManager.EndpointExists( EndpointName ) )
-			{
-				throw new Error( `The endpoint [${EndpointName}] already exists within [${service.ServiceName}].` );
-			}
-			// Register the endpoint.
-			let endpoint = service.EndpointManager.AddEndpoint( EndpointName, CommandFunction );
-			// Return, OK.
-			return;
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					// Make sure this endpoint doesn't already exist.
+					if ( service.EndpointManager.EndpointExists( EndpointName ) )
+					{
+						reject( new Error( `The endpoint [${EndpointName}] already exists within [${service.ServiceName}].` ) );
+						return;
+					}
+					// Register the endpoint.
+					let endpoint = service.EndpointManager.AddEndpoint( EndpointName, CommandFunction );
+					// Complete the function.
+					resolve( true );
+					return;
+				} );
 		};
 
 
 	//---------------------------------------------------------------------
 	service.CallEndpoint =
-		async ( EndpointName, CommandParameters, ReplyCallback = null ) =>
+		async ( EndpointName, CommandParameters, CommandCallback = null ) =>
 		{
-			// Validate that the endpoint exists.
-			if ( !service.EndpointManager.EndpointExists( EndpointName ) )
-			{
-				throw new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` );
-			}
-			// Invoke the endpoint.
-			try
-			{
-				let endpoint_handler = service.EndpointManager.Endpoints[ EndpointName ].Handler;
-				let endpoint_handler_script = endpoint_handler.toString();
-				let thread_script = null;
-				if ( endpoint_handler_script.startsWith( 'function ' ) )
+			return new Promise(
+				async ( resolve, reject ) => 
 				{
-					thread_script = `
-								const { parentPort, workerData } = require( 'worker_threads' );
-								let result =
-								(
-									${endpoint_handler_script}
-								)( workerData );
-								parentPort.postMessage( result );
-								`;
-				}
-				// else if ( endpoint_handler_script.startsWith( 'async ' ) )
-				// {
-				// 	thread_script = `
-				// 		const { parentPort, workerData } = require( 'worker_threads' );
-				// 		let result = await
-				// 		(
-				// 			${endpoint_handler_script}
-				// 		)( workerData );
-				// 		parentPort.postMessage( result );
-				// 		`;
-				// }
-				else
-				{
-					throw new Error( `Unknown function signature in [${endpoint_handler_script}].` );
-				}
-				let worker = new Worker(
-					thread_script,
+					// Validate that the endpoint exists.
+					if ( !service.EndpointManager.EndpointExists( EndpointName ) )
 					{
-						eval: true,
-						workerData: CommandParameters,
+						reject( new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` ) );
+						return;
 					}
-				);
-				if ( ReplyCallback )
-				{
-					worker.once( 'message', ( reply ) => ReplyCallback( null, reply ) );
-					worker.once( 'error', ( error ) => ReplyCallback( error, null ) );
-				}
-				else
-				{
-					worker.once( 'error', ( error ) => { throw error; } );
-				}
-				// worker.postMessage( CommandParameters );
-			}
-			catch ( error )
-			{
-				if ( ReplyCallback ) { ReplyCallback( error, null ); }
-			}
-			// Return, OK.
-			return;
+					// Invoke the endpoint.
+					try
+					{
+						let endpoint_handler = service.EndpointManager.Endpoints[ EndpointName ].Handler;
+						let endpoint_handler_script = endpoint_handler.toString();
+						let thread_script = null;
+						thread_script = `
+						const { parentPort, workerData } = require( 'worker_threads' );
+						let result =
+						(
+							${endpoint_handler_script}
+						)( workerData );
+						parentPort.postMessage( result );
+						`;
+						// if ( endpoint_handler_script.startsWith( 'function ' ) )
+						// {
+						// 	thread_script = `
+						// 				const { parentPort, workerData } = require( 'worker_threads' );
+						// 				let result =
+						// 				(
+						// 					${endpoint_handler_script}
+						// 				)( workerData );
+						// 				parentPort.postMessage( result );
+						// 				`;
+						// }
+						// else if ( endpoint_handler_script.startsWith( 'async ' ) )
+						// {
+						// 	thread_script = `
+						// 		const { parentPort, workerData } = require( 'worker_threads' );
+						// 		let result = await
+						// 		(
+						// 			${endpoint_handler_script}
+						// 		)( workerData );
+						// 		parentPort.postMessage( result );
+						// 		`;
+						// }
+						// else
+						// {
+						// 	reject( new Error( `Unknown function signature in [${endpoint_handler_script}].` ) );
+						// 	return;
+						// }
+						let worker = new Worker(
+							thread_script,
+							{
+								eval: true,
+								workerData: CommandParameters,
+							}
+						);
+						worker.once( 'message',
+							( reply ) => 
+							{
+								if ( CommandCallback ) { CommandCallback( null, reply ); }
+								resolve( reply );
+							} );
+						worker.once( 'error',
+							( error ) => 
+							{
+								if ( CommandCallback ) { CommandCallback( error, null ); }
+								reject( error );
+							} );
+					}
+					catch ( error )
+					{
+						if ( CommandCallback ) { CommandCallback( error, null ); }
+						reject( error );
+					}
+				} );
 		};
 
 

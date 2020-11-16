@@ -28,29 +28,36 @@ where `Endpoints` are executed:
 ## ServiceProvider Functions
 
 - `function ServiceProvider( ServiceName, Options )`
-	- Constructor function of a Service Provider implementation.
+	- Constructor function of a ServiceProvider implementation.
 	- Returns a newly created instance of the requested service provider.
 	- `ServiceName`: A name for the service, shared by `Endpoint` code and calling code.
-	- `Options`: Service provider specific options. e.g. connection info, etc.
+	- `Options`: Implementation specific options. e.g. connection info, etc.
 
 - `async function OpenPort()`
 	- Performs any work needed to initialize the transport mechanism and begin receiving requests.
-
+	- This function does not return a value.
+	- It is reccomended to `await` for completion of this function.
 
 - `async function ClosePort()`
-	- Shuts down any transport mechanisms in place and releases any remaining resources.
-
+	- Shuts down any transport mechanisms and releases any remaining resources.
+	- This function does not return a value.
+	- It is reccomended to `await` for completion of this function.
 
 - `async function AddEndpoint( EndpointName, CommandFunction )`
-	- Used by "server" code to host `Endpoints`.
+	- Used by "server" code to host callable `Endpoints`.
 	- `EndpointName`: The unique name of this endpoint within this service.
 	- `CommandFunction`: The function to execute when this endpoint is called.
+	- This function does not return a value.
+	- It is reccomended to `await` for completion of this function.
 
-
-- `async function CallEndpoint( EndpointName, CommandParameters, ReplyCallback = null )`
+- `async function CallEndpoint( EndpointName, CommandParameters, CommandCallback = null )`
 	- Used to invoke a (server) `Endpoint` by the (client) calling code.
+	- If this function is `await`ed, it will return whatever was returned from the invoked `Endpoint`.
+		Otherwise, the `Endpoint` reply can be obtained via the `CommandCallback` function.
 	- `EndpointName`: The name of the endpoint on this service to call.
-	- `CommandParameters`: The parameters to pass to this endpoint.
-	- `ReplyCallback`: The function to execute when the reply from the endpoint has been received.
-		If this is `null`, then no reply will be waited for and the function will return as soon
-		as the message has been sent.
+	- `CommandParameters`: The parameters to pass to the `Endpoint`.
+	- `CommandCallback`: A function to execute when the reply from the `Endpoint` has been received.
+		- The `CommandCallback` function should have the following signature: `function CommandCallback( Error, Reply )`.
+	- If `CommandCallback` is supplied and the function is also `await`ed on,
+		then `CommandCallback` will be executed first and then the function will complete.
+
