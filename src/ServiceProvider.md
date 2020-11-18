@@ -61,3 +61,17 @@ where `Endpoints` are executed:
 	- If `CommandCallback` is supplied and the function is also `await`ed on,
 		then `CommandCallback` will be executed first and then the function will complete.
 
+## ServiceProvider Flow
+
+- Open Command Channel
+- Receive Command Message
+	- Process Command Message
+	- Open Reply Channel
+	- Send Reply Message
+	- Close Reply Channel
+- Send Command Message
+	- Open Reply Channel
+	- Receive Reply Message
+	- Close Reply Channel
+	- Process Reply Message
+- Close Command Channel

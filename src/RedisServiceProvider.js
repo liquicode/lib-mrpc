@@ -5,19 +5,12 @@ const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
 const LIB_REDIS = require( 'redis' );
 const LIB_UNIQID = require( 'uniqid' );
 
-/*
-	[node_redis/node-redis](https://www.npmjs.com/package/redis)
-*/
 
 function RedisServiceProvider( ServiceName, Options )
 {
 
 	//---------------------------------------------------------------------
 	let service = LIB_SERVICE_PROVIDER.ServiceProvider( ServiceName, Options );
-
-
-	//---------------------------------------------------------------------
-	// service.RedisClient = null;
 
 
 	//---------------------------------------------------------------------

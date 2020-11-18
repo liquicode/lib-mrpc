@@ -69,12 +69,12 @@ When an endpoint is called, it will run within the same process.
 ### Local Service Provders
 
 Local service providers may store `Endpoints` within a different process as the calling code,
-but transport messages (requests and replies) using local system resources.
+but transport messages (requests and replies) using local system (os) resources.
 
-- `FileSystemServiceProvider`: 
-- `CommandLineServiceProvider`: 
-- `ClusterServiceProvider`: 
-- `ChildProcessServiceProvider`: 
+- `FSWatchServiceProvider`: Uses Node's `fs` library to communicate via a shared file system folder.
+- `CommandLineServiceProvider`: (***Not Implemented***)
+- `ClusterServiceProvider`: (***Not Implemented***)
+- `ChildProcessServiceProvider`: (***Not Implemented***)
 
 
 ### Remote Service Provders
@@ -83,13 +83,19 @@ Remote service providers may store code on a different machine from the calling 
 In many instances, these service providers require the inclusion of third-party libraries to implement the
 underlying transport mechanism.
 
-- `HttpServiceProvider`:
-- `SocketIOServiceProvider`:
+- `HttpGetServiceProvider`: (***Not Implemented***)
+- `HttpPostServiceProvider`: (***Not Implemented***)
+- `SocketIOServiceProvider`: (***Not Implemented***)
 - `AmqpLibServiceProvider`:
 	Service `Endpoints` are invoked remotely via a message queue supporting the [amqp](https://www.amqp.org/) v0.9.1 protocol.
 	Requires the [amqplib/amqp.node](https://github.com/squaremo/amqp.node) third-party library.
 	Tested with [RabbitMQ](https://www.rabbitmq.com/).
-
+- `TortoiseServiceProvider` : 
+	Service `Endpoints` are invoked remotely via a message broker supporting the [amqp](https://www.amqp.org/) v0.9.1 protocol.
+	Requires the [tortoise](https://github.com/CompassPHS/tortoise) third-party library.
+	Tested with [RabbitMQ](https://www.rabbitmq.com/).
+- `StompServiceProvider` : 
+- `RedisServiceProvider` : 
 
 ## ServiceClient
 
