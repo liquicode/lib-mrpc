@@ -50,6 +50,5 @@ await service.ClosePort();
 ## Resources
 
 - [redis library github](https://github.com/NodeRedis/node-redis)
-- [amqp protocol](https://www.amqp.org)
 - [redis server](https://www.redis.io)
 

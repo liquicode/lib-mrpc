@@ -1,5 +1,0 @@
-
-# LocalFolderServiceProvider
-
-## Overview
-

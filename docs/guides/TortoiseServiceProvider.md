@@ -6,7 +6,7 @@ A `ServiceProvider` for message brokers supporting the `amqp` protocol.
 
 ## Overview
 
-Service `Endpoints` are invoked remotely via a message broker supporting the [amqp] v0.9.1 protocol.
+Service `Endpoints` are invoked remotely via a message broker supporting the [amqp](https://www.amqp.org/) v0.9.1 protocol.
 Requires the [tortoise](https://github.com/CompassPHS/tortoise) third-party library.
 Tested with [RabbitMQ](https://www.rabbitmq.com/).
 

@@ -1,20 +1,24 @@
 <!-- _coverpage.md -->
 
-![logo](media/lib-mrpc.png)
+![logo](media/lib-mrpc-banner-640x128.png)
 
-# lib-mrpc <small>0.0.1</small>
+# lib-mrpc <small>v 0.0.1</small>
 
-> A transport agnostic message based remote procedure call
+<hr>
 
-> library designed to facilitate the evolution and
+> A transport agnostic message based remote procedure call library
 
-> scalability of complex systems.
+> Use lib-mrpc to develop service oriented systems that scale easily
 
-- Simple and lightweight (~10kB)
+> Utilize various ServiceProviders to fit multiple deployment scenarios
+
+<hr>
+
+- Simple and lightweight (~10kb)
 - Minimal dependencies - Core is 100% JavaScript
 - Easily scale functions using various mechanisms.
 
-[GitHub](https://github.com/liquicode/lib-mrpc/)
+[GitHub](https://github.com/liquicode/lib-mrpc)
 [Get Started](guides/readme.md)
 
 
