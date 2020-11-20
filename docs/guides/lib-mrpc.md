@@ -83,9 +83,14 @@ Remote service providers may store code on a different machine from the calling 
 In many instances, these service providers require the inclusion of third-party libraries to implement the
 underlying transport mechanism.
 
+***Web Sockets***
+
 - `HttpGetServiceProvider`: (***Not Implemented***)
 - `HttpPostServiceProvider`: (***Not Implemented***)
 - `SocketIOServiceProvider`: (***Not Implemented***)
+
+***Message Queues***
+
 - `AmqpLibServiceProvider`:
 	Service `Endpoints` are invoked remotely via a message queue supporting the [amqp](https://www.amqp.org/) v0.9.1 protocol.
 	Requires the [amqplib/amqp.node](https://github.com/squaremo/amqp.node) third-party library.
@@ -95,7 +100,12 @@ underlying transport mechanism.
 	Requires the [tortoise](https://github.com/CompassPHS/tortoise) third-party library.
 	Tested with [RabbitMQ](https://www.rabbitmq.com/).
 - `StompServiceProvider` : 
+
+***General Pub/Sub***
+
 - `RedisServiceProvider` : 
+- `MongoDBServiceProvider` : 
+
 
 ## ServiceClient
 

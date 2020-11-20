@@ -1,6 +1,15 @@
 'use strict';
 
 
+//=====================================================================
+//=====================================================================
+//
+//		Local Service Providers
+//
+//=====================================================================
+//=====================================================================
+
+
 //---------------------------------------------------------------------
 const LIB_IMMEDIATE_SERVICE_PROVIDER = require( './ImmediateServiceProvider.js' );
 exports.ImmediateServiceProvider = LIB_IMMEDIATE_SERVICE_PROVIDER.ImmediateServiceProvider;
@@ -16,14 +25,24 @@ const LIB_WORKER_THREAD_SERVICE_PROVIDER = require( './WorkerThreadServiceProvid
 exports.WorkerThreadServiceProvider = LIB_WORKER_THREAD_SERVICE_PROVIDER.WorkerThreadServiceProvider;
 
 
-// //---------------------------------------------------------------------
-// const LIB_STOMP_SERVICE_PROVIDER = require( './StompServiceProvider.js' );
-// exports.StompServiceProvider = LIB_STOMP_SERVICE_PROVIDER.StompServiceProvider;
+//=====================================================================
+//=====================================================================
+//
+//		Remote Service Providers
+//			- Message Queues
+//
+//=====================================================================
+//=====================================================================
 
 
-// //---------------------------------------------------------------------
-// const LIB_TORTOISE_SERVICE_PROVIDER = require( './TortoiseServiceProvider.js' );
-// exports.TortoiseServiceProvider = LIB_TORTOISE_SERVICE_PROVIDER.TortoiseServiceProvider;
+//---------------------------------------------------------------------
+const LIB_STOMP_SERVICE_PROVIDER = require( './StompServiceProvider.js' );
+exports.StompServiceProvider = LIB_STOMP_SERVICE_PROVIDER.StompServiceProvider;
+
+
+//---------------------------------------------------------------------
+const LIB_TORTOISE_SERVICE_PROVIDER = require( './TortoiseServiceProvider.js' );
+exports.TortoiseServiceProvider = LIB_TORTOISE_SERVICE_PROVIDER.TortoiseServiceProvider;
 
 
 //---------------------------------------------------------------------
@@ -31,9 +50,19 @@ const LIB_AMQPLIB_SERVICE_PROVIDER = require( './AmqpLibServiceProvider.js' );
 exports.AmqpLibServiceProvider = LIB_AMQPLIB_SERVICE_PROVIDER.AmqpLibServiceProvider;
 
 
+//=====================================================================
+//=====================================================================
+//
+//		Remote Service Providers
+//			- Pub/Sub
+//
+//=====================================================================
+//=====================================================================
+
+
 //---------------------------------------------------------------------
-// const LIB_THREAD_CHANNEL_PROVIDER = require( './ThreadChannelProvider.js' );
-// exports.ThreadChannelProvider = LIB_THREAD_CHANNEL_PROVIDER.ThreadChannelProvider;
+const LIB_REDIS_SERVICE_PROVIDER = require( './RedisServiceProvider.js' );
+exports.RedisServiceProvider = LIB_REDIS_SERVICE_PROVIDER.RedisServiceProvider;
 
 
 //=====================================================================

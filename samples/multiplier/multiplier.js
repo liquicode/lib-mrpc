@@ -126,12 +126,13 @@ async function create_multiplication_table( ServiceClient, Size )
 
 ( async () =>
 {
-	let multiplier_service = await require( './MultiplierServiceFactory.js' ).ImmediateMultiplierService();
+	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).ImmediateMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).DeferredMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).WorkerThreadMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).StompMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).TortoiseMultiplierService();
 	// let multiplier_service = await require( './MultiplierServiceFactory.js' ).AmqpLibMultiplierService();
+	let multiplier_service = await require( './MultiplierServiceFactory.js' ).RedisMultiplierService();
 	let service_client = LIB_MRPC.ServiceClient;
 	service_client.ConnectService( multiplier_service );
 	let start_time = Date.now();

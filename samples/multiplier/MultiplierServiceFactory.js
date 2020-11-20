@@ -166,14 +166,7 @@ exports.TortoiseMultiplierService =
 		// Create the Multiplier service.
 		let service = await LIB_MRPC.TortoiseServiceProvider(
 			MULTIPLIER_SERVICE_NAME,
-			{
-				server: 'amqp://localhost/multiplier',
-				connect_options:
-				{
-					connectRetries: 10,
-					connectRetryInterval: 1000,
-				},
-			},
+			{ server: 'amqp://localhost' },
 		);
 
 		//---------------------------------------------------------------------
@@ -205,14 +198,39 @@ exports.AmqpLibMultiplierService =
 		// Create the Multiplier service.
 		let service = await LIB_MRPC.AmqpLibServiceProvider(
 			MULTIPLIER_SERVICE_NAME,
-			{
-				server: 'amqp://localhost/test',
-				connect_options:
-				{
-					connectRetries: 10,
-					connectRetryInterval: 1000,
-				},
-			},
+			{ server: 'amqp://localhost' },
+		);
+
+		//---------------------------------------------------------------------
+		// Activate the Multiplier service.
+		await service.OpenPort();
+
+		//---------------------------------------------------------------------
+		// Register the Multiplier handler
+		await service.AddEndpoint( 'Multiply', multiply_function );
+
+		//---------------------------------------------------------------------
+		// Return the Multiplier service.
+		return service;
+	};
+
+
+//=====================================================================
+//=====================================================================
+//
+//		Multiplier : Redis Service
+//
+//=====================================================================
+//=====================================================================
+
+exports.RedisMultiplierService =
+	async () =>
+	{
+		//---------------------------------------------------------------------
+		// Create the Multiplier service.
+		let service = await LIB_MRPC.RedisServiceProvider(
+			MULTIPLIER_SERVICE_NAME,
+			{ server: 'redis://localhost' },
 		);
 
 		//---------------------------------------------------------------------

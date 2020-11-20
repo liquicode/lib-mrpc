@@ -14,8 +14,8 @@
 
 <hr>
 
-- Simple and lightweight (~10kb)
-- Minimal dependencies - Core is 100% JavaScript
+- Simple and lightweight (less than 20kb)
+- Minimal dependencies - Core is 100% JavaScript with No Dependencies
 - Easily scale functions using various mechanisms.
 
 [GitHub](https://github.com/liquicode/lib-mrpc)
