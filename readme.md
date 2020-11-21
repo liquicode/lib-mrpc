@@ -8,13 +8,14 @@ evolution and scalability of complex systems.
 
 This library allows you to define a number of specific commands (`Endpoints`) that can be
 invoked, regardless of location, using a transport abstraction (`ServiceProvider`).
-An `Endpoint` represents a function that does specific work for an application.
+An `Endpoint` represents a function that does some specific work for an application.
+
 
 
 ## Installation
 
 ```bash
-npm install @liquicode/lib-mrpc
+npm install --save @liquicode/lib-mrpc
 ```
 
 ## Simple Usage
@@ -53,9 +54,12 @@ console.log( '6 * 7 = ' +  result ); // 6 * 7 = 42
 
 ## Remote Functions
 
-This example takes the same functionality of a simple multiply function and lets you 
+This example takes the same functionality (a multiply function) and lets you 
 call it remotely via a message queue server that supports the `amqp` protocol
 (e.g. [RabbitMQ](https://www.rabbitmq.com/)).
+Remoting the function has minimal impact on your code as all that is required
+is to change the type of `ServiceProvider` that you use. The function signatures
+and mechanics are identical across all types of `ServiceProvider`.
 
 ***server.js***:
 ```javascript
@@ -93,21 +97,77 @@ console.log( '6 * 7 = ' +  result ); // 6 * 7 = 42
 ```
 
 
+## Remoting Errors
+
+Just like any other function, `Endpoint`s can throw errors, intentional or otherwise.
+`lib-mrpc` catches these errors and then remotes them back to the calling function.
+
+The following example uses `RedisServiceProvider` to communicate with a remote service
+via an existing [redis](https://www.redis.io) server.
+
+***server.js***:
+```javascript
+const lib_mrpc = require( '@liquicode/lib-mrpc' );
+let service = lib_mrpc.RedisServiceProvider( 'My Service', { server: 'redis://my-redis' } );
+service.OpenPort();
+await service.AddEndpoint( 
+	'Gives Errors',
+	( Parameters ) =>
+	{
+		throw new Error('Error something about something.'); // Just throw an error.
+	} );
+```
+
+***client.js***:
+```javascript
+const lib_mrpc = require( '@liquicode/lib-mrpc' );
+let service = lib_mrpc.RedisServiceProvider( 'My Service', { server: 'redis://my-redis' } );
+service.OpenPort();
+
+// Call the service function, expect errors.
+try
+{
+	await service.CallEndpoint( 'My Service', 'Gives Errors', {} );
+}
+catch( error )
+{
+	console.log( error.message ); // "Error something about something."
+}
+
+// Or, call the service function and get errors in the callback.
+service.CallEndpoint( 'My Service', 'Gives Errors', {},
+	( error, reply ) =>
+	{
+		if( error )
+		{
+			console.log( error.message ); // "Error something about something."
+		}
+		else
+		{
+			console.log( "What am I doing here?" ); // This doesn't executed.
+		}
+	} );
+```
+
+
 
 
 ## Documentation
 
-- [Documentation](http://lib-mrpc.liquicode.com)
-- [Samples](https://github.com/liquicode/lib-mrpc/tree/master/samples)
-- [Tests](https://github.com/liquicode/lib-mrpc/tree/master/tests)
+- [lib-mrpc Documentation](http://lib-mrpc.liquicode.com)
+- [lib-mrpc Samples](https://github.com/liquicode/lib-mrpc/tree/master/samples)
+- [lib-mrpc Tests](https://github.com/liquicode/lib-mrpc/tree/master/tests)
 
 
 ## TODO
 
 - Define strict semantics regarding `OpenPort`.
 	Should it be called before any calls to `AddEndpoint`?
-- Ensure that all `ServiceProvider`s remote any errors thrown by `Endpoint` functions.
 - Develop the `ServiceTransaction` object.
 	- `StartTransaction`: Begin aggregating calls to `Endpoint`s.
 	- `CommitTransaction`: Execute aggregated calls to `Endpoint`s.
 	- `RollbackTransaction`: Use `Undo` data to undo the effects of all service calls.
+- `WorkerThreadServiceProvider`:
+	- Use a thread pool so it doesn't just blindly consume all of the resources anyway.
+- `ServiceProvider` needs to have a `UniqueID()` function to replace the `uniqid` npm package.
+

@@ -113,12 +113,25 @@ function TortoiseServiceProvider( ServiceName, Options )
 								try
 								{
 									let request = JSON.parse( message );
-									let result = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
-									if ( request.ReplyID )
+									let response =
+									{
+										ReplyID: request.ReplyID,
+										EndpointResult: null,
+										EndpointError: null,
+									};
+									try
+									{
+										response.EndpointResult = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
+									}
+									catch ( error ) 
+									{
+										response.EndpointError = error.message;
+									}
+									if ( response.ReplyID )
 									{
 										await service.QueueClient
-											.queue( `/queue/${service.ServiceName}/${EndpointName}/${request.ReplyID}`, service.Options.reply_queue_options )
-											.publish( JSON.stringify( result ) );
+											.queue( `/queue/${service.ServiceName}/${EndpointName}/${response.ReplyID}`, service.Options.reply_queue_options )
+											.publish( JSON.stringify( response ) );
 									}
 									ack();
 								}
@@ -164,17 +177,24 @@ function TortoiseServiceProvider( ServiceName, Options )
 							{
 								try
 								{
-									let reply = JSON.parse( message );
-									if ( CommandCallback ) { CommandCallback( null, reply ); }
+									let response = JSON.parse( message );
+									if ( response.EndpointError )
+									{
+										let error = new Error( response.EndpointError );
+										if ( CommandCallback ) { CommandCallback( error, null ); }
+										reject( error );
+									}
+									else
+									{
+										if ( CommandCallback ) { CommandCallback( null, response.EndpointResult ); }
+										resolve( response.EndpointResult );
+									}
 									ack();
-									// Complete the function.
-									resolve( reply );
 								}
 								catch ( error )
 								{
 									nack( false );
 									if ( CommandCallback ) { CommandCallback( error, null ); }
-									// Complete the function.
 									reject( error );
 								}
 								finally

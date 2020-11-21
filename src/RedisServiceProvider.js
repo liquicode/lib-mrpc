@@ -92,12 +92,25 @@ function RedisServiceProvider( ServiceName, Options )
 							try
 							{
 								let request = JSON.parse( message );
-								let result = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
-								if ( request.ReplyID )
+								let response =
 								{
-									let reply_queue_name = `${service.ServiceName}/${EndpointName}/${request.ReplyID}`;
+									ReplyID: request.ReplyID,
+									EndpointResult: null,
+									EndpointError: null,
+								};
+								try
+								{
+									response.EndpointResult = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
+								}
+								catch ( error ) 
+								{
+									response.EndpointError = error.message;
+								}
+								if ( response.ReplyID )
+								{
+									let reply_queue_name = `${service.ServiceName}/${EndpointName}/${response.ReplyID}`;
 									let reply_channel = LIB_REDIS.createClient( service.Options );
-									reply_channel.publish( reply_queue_name, JSON.stringify( result ) );
+									reply_channel.publish( reply_queue_name, JSON.stringify( response ) );
 									reply_channel.quit();
 								}
 							}
@@ -143,16 +156,22 @@ function RedisServiceProvider( ServiceName, Options )
 						{
 							try
 							{
-								let reply = JSON.parse( message );
-								if ( CommandCallback ) { CommandCallback( null, reply ); }
-								// Complete the function.
-								resolve( reply );
+								let response = JSON.parse( message );
+								if ( response.EndpointError )
+								{
+									let error = new Error( response.EndpointError );
+									if ( CommandCallback ) { CommandCallback( error, null ); }
+									reject( error );
+								}
+								else
+								{
+									if ( CommandCallback ) { CommandCallback( null, response.EndpointResult ); }
+									resolve( response.EndpointResult );
+								}
 							}
 							catch ( error )
 							{
-								nack( false );
 								if ( CommandCallback ) { CommandCallback( error, null ); }
-								// Complete the function.
 								reject( error );
 							}
 							finally
@@ -160,7 +179,6 @@ function RedisServiceProvider( ServiceName, Options )
 								reply_channel.unsubscribe();
 								reply_channel.quit();
 							}
-							return;
 							return;
 						} );
 					reply_channel.subscribe( reply_queue_name );
@@ -176,6 +194,7 @@ function RedisServiceProvider( ServiceName, Options )
 					let channel = LIB_REDIS.createClient( service.Options );
 					channel.publish( queue_name, JSON.stringify( message ) );
 					channel.quit();
+					return;
 				} );
 		};
 

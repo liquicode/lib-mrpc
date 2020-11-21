@@ -62,11 +62,24 @@ function FSWatchServiceProvider( ServiceName, Options )
 								{
 									let message = LIB_FS.readFileSync( filename );
 									let request = JSON.parse( message );
-									let result = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
-									if ( request.ReplyID )
+									let response =
 									{
-										let reply_filename = LIB_PATH.join( command_path, request.ReplyID + '.reply' );
-										LIB_FS.writeFileSync( reply_filename, JSON.stringify( result ) );
+										ReplyID: request.ReplyID,
+										EndpointResult: null,
+										EndpointError: null,
+									};
+									try
+									{
+										response.EndpointResult = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
+									}
+									catch ( error ) 
+									{
+										response.EndpointError = error.message;
+									}
+									if ( response.ReplyID )
+									{
+										let reply_filename = LIB_PATH.join( command_path, response.ReplyID + '.reply' );
+										LIB_FS.writeFileSync( reply_filename, JSON.stringify( response ) );
 									}
 								}
 								catch ( error )
@@ -176,9 +189,18 @@ function FSWatchServiceProvider( ServiceName, Options )
 								try
 								{
 									let message = LIB_FS.readFileSync( filename );
-									let reply = JSON.parse( message );
-									if ( CommandCallback ) { CommandCallback( null, reply ); }
-									resolve( reply );
+									let response = JSON.parse( message );
+									if ( response.EndpointError )
+									{
+										let error = new Error( response.EndpointError );
+										if ( CommandCallback ) { CommandCallback( error, null ); }
+										reject( error );
+									}
+									else
+									{
+										if ( CommandCallback ) { CommandCallback( null, response.EndpointResult ); }
+										resolve( response.EndpointResult );
+									}
 								}
 								catch ( error )
 								{

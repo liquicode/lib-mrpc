@@ -119,15 +119,28 @@ function AmqpLibServiceProvider( ServiceName, Options )
 							{
 								let message_string = message.content.toString();
 								let request = JSON.parse( message_string );
-								let result = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
-								if ( request.ReplyID )
+								let response =
 								{
-									let reply_queue_name = queue_name + `/${request.ReplyID}`;
+									ReplyID: request.ReplyID,
+									EndpointResult: null,
+									EndpointError: null,
+								};
+								try
+								{
+									response.EndpointResult = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
+								}
+								catch ( error ) 
+								{
+									response.EndpointError = error.message;
+								}
+								if ( response.ReplyID )
+								{
+									let reply_queue_name = queue_name + `/${response.ReplyID}`;
 									let reply_channel = await service.QueueClient.createChannel();
 									result_ok = await reply_channel.assertQueue( reply_queue_name, service.Options.reply_queue_options );
 									result_ok = reply_channel.sendToQueue(
 										reply_queue_name,
-										Buffer.from( JSON.stringify( result ) ),
+										Buffer.from( JSON.stringify( response ) ),
 										{
 											contentType: "text/plain",
 											// deliveryMode: 1,
@@ -182,21 +195,26 @@ function AmqpLibServiceProvider( ServiceName, Options )
 							try
 							{
 								let message_string = message.content.toString();
-								let reply = JSON.parse( message_string );
-								if ( CommandCallback ) { CommandCallback( null, reply ); }
-								// Complete the function.
-								resolve( reply );
+								let response = JSON.parse( message_string );
+								if ( response.EndpointError )
+								{
+									let error = new Error( response.EndpointError );
+									if ( CommandCallback ) { CommandCallback( error, null ); }
+									reject( error );
+								}
+								else
+								{
+									if ( CommandCallback ) { CommandCallback( null, response.EndpointResult ); }
+									resolve( response.EndpointResult );
+								}
 							}
 							catch ( error )
 							{
 								if ( CommandCallback ) { CommandCallback( error, null ); }
-								// Complete the function.
 								reject( error );
 							}
 							finally
 							{
-								// result_ok = await service.QueueChannel.deleteQueue( reply_queue_name );
-								// reply_channel.deleteQueue( reply_queue_name );
 								reply_channel.close();
 							}
 						},

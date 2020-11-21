@@ -99,12 +99,12 @@ underlying transport mechanism.
 	Service `Endpoints` are invoked remotely via a message broker supporting the [amqp](https://www.amqp.org/) v0.9.1 protocol.
 	Requires the [tortoise](https://github.com/CompassPHS/tortoise) third-party library.
 	Tested with [RabbitMQ](https://www.rabbitmq.com/).
-- `StompServiceProvider` : 
+- `StompServiceProvider` : (***Document Here***)
 
 ***General Pub/Sub***
 
-- `RedisServiceProvider` : 
-- `MongoDBServiceProvider` : 
+- `RedisServiceProvider` : (***Document Here***)
+- `MongoDBServiceProvider` : (***Not Implemented***)
 
 
 ## ServiceClient
@@ -125,12 +125,17 @@ underlying transport mechanism.
 	- function `CommandCallback` : The callback function used to report endpoint results.
 
 
-## Resources
+## Resources / References
+
+***Generators***
 
 - [Yield! Yield! How Generators work in JavaScript.](https://www.freecodecamp.org/news/yield-yield-how-generators-work-in-javascript-3086742684fc/)
 - [Trying to understand generators / yield in node.js - what executes the asynchronous function?](https://stackoverflow.com/questions/17516952/trying-to-understand-generators-yield-in-node-js-what-executes-the-asynchron)
 - [A Study on Solving Callbacks with JavaScript Generators](https://jlongster.com/A-Study-on-Solving-Callbacks-with-JavaScript-Generators)
 - [A Closer Look at Generators Without Promises](https://jlongster.com/A-Closer-Look-at-Generators-Without-Promises)
+
+***CSP Channels***
+
 - [Taming the Asynchronous Beast with CSP Channels in JavaScript](https://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript)
 
 
