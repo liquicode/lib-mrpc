@@ -9,7 +9,7 @@ var TestService = null;
 var TestClient = null;
 
 //---------------------------------------------------------------------
-describe( `51) AmqpLib Tests`,
+describe( `41) AmqpLib Tests`,
 	function ()
 	{
 

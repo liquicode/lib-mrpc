@@ -9,7 +9,7 @@ var TestService = null;
 var TestClient = null;
 
 //---------------------------------------------------------------------
-describe( `53) Redis Tests`,
+describe( `61) Redis Tests`,
 	function ()
 	{
 

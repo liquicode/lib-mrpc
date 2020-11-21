@@ -2,8 +2,18 @@
 
 
 const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
-const LIB_AMQPLIB = require( 'amqplib' );
-const LIB_UNIQID = require( 'uniqid' );
+
+var LIB_AMQPLIB = null;
+try
+{
+	LIB_AMQPLIB = require( 'amqplib' );
+}
+catch ( error ) 
+{
+	console.error( 'The npm library [amqplib] was not found.' );
+	console.error( 'To install [amqplib] please use: npm install --save amqplib' );
+	throw error;
+}
 
 
 function AmqpLibServiceProvider( ServiceName, Options )
@@ -183,7 +193,7 @@ function AmqpLibServiceProvider( ServiceName, Options )
 						throw new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` );
 					}
 					// Setup the reply channel
-					let reply_id = LIB_UNIQID();
+					let reply_id = service.UniqueID();
 					let reply_queue_name = `${service.ServiceName}/${EndpointName}/${reply_id}`;
 					let reply_channel = await service.QueueClient.createChannel();
 					await reply_channel.assertQueue( reply_queue_name, service.Options.reply_queue_options );

@@ -2,8 +2,18 @@
 
 
 const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
-const LIB_REDIS = require( 'redis' );
-const LIB_UNIQID = require( 'uniqid' );
+
+var LIB_REDIS = null;
+try
+{
+	LIB_REDIS = require( 'redis' );
+}
+catch ( error ) 
+{
+	console.error( 'The npm library [redis] was not found.' );
+	console.error( 'To install [redis] please use: npm install --save redis' );
+	throw error;
+}
 
 
 function RedisServiceProvider( ServiceName, Options )
@@ -148,7 +158,7 @@ function RedisServiceProvider( ServiceName, Options )
 						return;
 					}
 					// Setup the reply channel
-					let reply_id = LIB_UNIQID();
+					let reply_id = service.UniqueID();
 					let reply_queue_name = `${service.ServiceName}/${EndpointName}/${reply_id}`;
 					let reply_channel = LIB_REDIS.createClient( service.Options );
 					reply_channel.on( 'message',

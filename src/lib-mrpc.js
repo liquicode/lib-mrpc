@@ -36,8 +36,8 @@ exports.WorkerThreadServiceProvider = LIB_WORKER_THREAD_SERVICE_PROVIDER.WorkerT
 
 
 //---------------------------------------------------------------------
-const LIB_STOMP_SERVICE_PROVIDER = require( './StompServiceProvider.js' );
-exports.StompServiceProvider = LIB_STOMP_SERVICE_PROVIDER.StompServiceProvider;
+const LIB_AMQPLIB_SERVICE_PROVIDER = require( './AmqpLibServiceProvider.js' );
+exports.AmqpLibServiceProvider = LIB_AMQPLIB_SERVICE_PROVIDER.AmqpLibServiceProvider;
 
 
 //---------------------------------------------------------------------
@@ -46,8 +46,8 @@ exports.TortoiseServiceProvider = LIB_TORTOISE_SERVICE_PROVIDER.TortoiseServiceP
 
 
 //---------------------------------------------------------------------
-const LIB_AMQPLIB_SERVICE_PROVIDER = require( './AmqpLibServiceProvider.js' );
-exports.AmqpLibServiceProvider = LIB_AMQPLIB_SERVICE_PROVIDER.AmqpLibServiceProvider;
+const LIB_STOMPIT_SERVICE_PROVIDER = require( './StompitServiceProvider.js' );
+exports.StompitServiceProvider = LIB_STOMPIT_SERVICE_PROVIDER.StompitServiceProvider;
 
 
 //=====================================================================

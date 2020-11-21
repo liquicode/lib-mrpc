@@ -1,6 +1,9 @@
 'use strict';
 
 
+const LIB_CRYPTO = require( "crypto" );
+
+
 function EndpointManager()
 {
 	return {
@@ -123,34 +126,26 @@ function ServiceProvider( ServiceName, Options )
 		MessageManager: MessageManager(),
 
 		//---------------------------------------------------------------------
-		Sleep:
-			async function Sleep( Milliseconds )
+		UniqueID:
+			function UniqueID( Size = 12 )
 			{
-				return new Promise( resolve => setTimeout( resolve, Milliseconds ) );
-			},
-
-		//---------------------------------------------------------------------
-		WaitWhile:
-			async function WaitWhile( Condition )
-			{
-				return new Promise(
-					async ( resolve, reject ) => 
+				let alphabet = 'abcdefghijklmnopqrstuvwxyz1234567890';
+				let alphabet_1st = 'abcdefghijklmnopqrstuvwxyz';
+				let result = '';
+				for ( let index = 0; index < Size; index++ )
+				{
+					if ( index === 0 )
 					{
-						while ( Condition() ) { await this.Sleep( 1 ); }
-						resolve( true );
-					} );
-			},
-
-		//---------------------------------------------------------------------
-		WaitUntil:
-			async function WaitUntil( Condition )
-			{
-				return new Promise(
-					async ( resolve, reject ) => 
+						// Make sure the 1st character of the ID is non-numeric.
+						result += alphabet_1st[ LIB_CRYPTO.randomInt( 0, alphabet_1st.length - 1 ) ];
+					}
+					else
 					{
-						while ( !Condition() ) { await this.Sleep( 1 ); }
-						resolve( true );
-					} );
+						// Use the entire alphabet for the rest of the ID.
+						result += alphabet[ LIB_CRYPTO.randomInt( 0, alphabet.length - 1 ) ];
+					}
+				}
+				return result;
 			},
 
 		//---------------------------------------------------------------------
@@ -184,6 +179,38 @@ function ServiceProvider( ServiceName, Options )
 				return options;
 			},
 
+		//---------------------------------------------------------------------
+		Sleep:
+			async function Sleep( Milliseconds )
+			{
+				return new Promise( resolve => setTimeout( resolve, Milliseconds ) );
+			},
+
+		//---------------------------------------------------------------------
+		WaitWhile:
+			async function WaitWhile( Condition )
+			{
+				return new Promise(
+					async ( resolve, reject ) => 
+					{
+						while ( Condition() ) { await this.Sleep( 1 ); }
+						resolve( true );
+					} );
+			},
+
+		//---------------------------------------------------------------------
+		WaitUntil:
+			async function WaitUntil( Condition )
+			{
+				return new Promise(
+					async ( resolve, reject ) => 
+					{
+						while ( !Condition() ) { await this.Sleep( 1 ); }
+						resolve( true );
+					} );
+			},
+
+			
 		//---------------------------------------------------------------------
 		DefaultOptions: function DefaultOptions() { throw new Error( `DefaultOptions is not implemented in ServiceProvider.` ); },
 

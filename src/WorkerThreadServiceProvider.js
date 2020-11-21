@@ -9,6 +9,7 @@ const
 		parentPort,
 		workerData
 	} = require( 'worker_threads' );
+// Requires >= NodeJS v12 LTS
 
 
 function WorkerThreadServiceProvider( ServiceName, Options )

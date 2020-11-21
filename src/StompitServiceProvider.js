@@ -1,8 +1,19 @@
 'use strict';
 
 
-const LIB_STOMPIT = require( 'stompit' );
-const LIB_UNIQID = require( 'uniqid' );
+const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
+
+var LIB_STOMPIT = null;
+try
+{
+	LIB_STOMPIT = require( 'stompit' );
+}
+catch ( error ) 
+{
+	console.error( 'The npm library [stompit] was not found.' );
+	console.error( 'To install [stompit] please use: npm install --save stompit' );
+	throw error;
+}
 
 
 /*
@@ -170,7 +181,7 @@ exports.StompitServiceProvider =
 						throw new Error( `The endpoint [${EndpointName}] does not exist within [${this.ServiceName}].` );
 					}
 					// Setup the reply channel
-					let reply_id = LIB_UNIQID();
+					let reply_id = service.UniqueID();
 					let subscription = this.QueueClient.subscribe(
 						{
 							destination: `/queue/${this.ServiceName}/${EndpointName}/${reply_id}`,

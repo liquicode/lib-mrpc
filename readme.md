@@ -6,10 +6,17 @@ evolution and scalability of complex systems.
 
 ## Overview
 
-This library allows you to define a number of specific commands (`Endpoints`) that can be
-invoked, regardless of location, using a transport abstraction (`ServiceProvider`).
-An `Endpoint` represents a function that does some specific work for an application.
+What this library offers is a base `ServiceProvider` class and a number of specific `ServiceProvider`
+implementations where each implementation utilizes a different transport mechanism to provide the
+library's remote procedure call functionality.
+Examples of different transport mechanisms include http gets and posts, message queues, pub/sub channels, etc.
 
+Each `ServiceProvider` allows you to define a number of named `Endpoints` that can be invoked by client code.
+Each endpoint has function associated with it and is called whenever the `Endpoint` is invoked.
+The function is passed a set of parameters and its return values and errors are to delivered back
+to the client calling code.
+The mechanics of packaging and unpackaging parameters, return values, and errors are handled by each
+`ServiceProvider` implementation.
 
 
 ## Installation
@@ -144,7 +151,7 @@ service.CallEndpoint( 'My Service', 'Gives Errors', {},
 		}
 		else
 		{
-			console.log( "What am I doing here?" ); // This doesn't executed.
+			console.log( "What am I doing here?" ); // This doesn't get executed.
 		}
 	} );
 ```
@@ -159,13 +166,10 @@ service.CallEndpoint( 'My Service', 'Gives Errors', {},
 
 ## TODO
 
-- Define strict semantics regarding `OpenPort`.
-	Should it be called before any calls to `AddEndpoint`?
 - Develop the `ServiceTransaction` object.
 	- `StartTransaction`: Begin aggregating calls to `Endpoint`s.
 	- `CommitTransaction`: Execute aggregated calls to `Endpoint`s.
 	- `RollbackTransaction`: Use `Undo` data to undo the effects of all service calls.
 - `WorkerThreadServiceProvider`:
 	- Use a thread pool so it doesn't just blindly consume all of the resources anyway.
-- `ServiceProvider` needs to have a `UniqueID()` function to replace the `uniqid` npm package.
 

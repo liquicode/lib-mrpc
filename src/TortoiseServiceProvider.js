@@ -2,8 +2,18 @@
 
 
 const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
-const LIB_TORTOISE = require( 'tortoise' );
-const LIB_UNIQID = require( 'uniqid' );
+
+var LIB_TORTOISE = null;
+try
+{
+	LIB_TORTOISE = require( 'tortoise' );
+}
+catch ( error ) 
+{
+	console.error( 'The npm library [tortoise] was not found.' );
+	console.error( 'To install [tortoise] please use: npm install --save tortoise' );
+	throw error;
+}
 
 
 function TortoiseServiceProvider( ServiceName, Options )
@@ -168,7 +178,7 @@ function TortoiseServiceProvider( ServiceName, Options )
 						return;
 					}
 					// Setup the reply channel
-					let reply_id = LIB_UNIQID();
+					let reply_id = service.UniqueID();
 					let channel = await service.QueueClient
 						.queue( `/queue/${service.ServiceName}/${EndpointName}/${reply_id}`, service.Options.reply_queue_options )
 						.prefetch( 1 )
