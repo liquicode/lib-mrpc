@@ -14,11 +14,11 @@
 
 - Local Service Providers
 
-	- [LocalFolderServiceProvider](guides/LocalFolderServiceProvider.md)
+	- [FSWatchServiceProvider](guides/FSWatchServiceProvider.md)
 
 - Remote Service Providers
 
 	- [AmqpLibServiceProvider](guides/AmqpLibServiceProvider.md)
-	- [StompServiceProvider](guides/StompServiceProvider.md)
+	- [StompitServiceProvider](guides/StompitServiceProvider.md)
 	- [TortoiseServiceProvider](guides/TortoiseServiceProvider.md)
 	- [RedisServiceProvider](guides/RedisServiceProvider.md)

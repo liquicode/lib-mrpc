@@ -4,7 +4,7 @@
 
 ## Overview
 
-redis is in-memory data structure store server which also has basic Pub/Sub capabilties.
+redis is an in-memory data structure store server which also has basic Pub/Sub capabilties.
 
 `lib-mrpc` utilizes the redis Pub/Sub functions to route commands and replies between
 client and server instances of a `RedisServiceProvider` object.
@@ -84,7 +84,7 @@ await service.ClosePort();
 ```
 
 
-## Implementation Notes
+## Implementation
 
 The `RedisServiceProvider` object implements all of the `ServiceProvider` methods.
 

@@ -152,7 +152,7 @@ service.CallEndpoint( 'My Service', 'Gives Errors', {},
 
 
 
-## Documentation
+## More Documentation
 
 - [lib-mrpc Documentation](http://lib-mrpc.liquicode.com)
 - [lib-mrpc Samples](https://github.com/liquicode/lib-mrpc/tree/master/samples)

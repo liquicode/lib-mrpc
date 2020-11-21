@@ -18,7 +18,7 @@ cp ./src/WorkerThreadServiceProvider.md ./docs/guides/WorkerThreadServiceProvide
 cp ./src/FSWatchServiceProvider.md ./docs/guides/FSWatchServiceProvider.md
 
 cp ./src/AmqpLibServiceProvider.md ./docs/guides/AmqpLibServiceProvider.md
-cp ./src/StompServiceProvider.md ./docs/guides/StompServiceProvider.md
+cp ./src/StompitServiceProvider.md ./docs/guides/StompitServiceProvider.md
 cp ./src/TortoiseServiceProvider.md ./docs/guides/TortoiseServiceProvider.md
 cp ./src/RedisServiceProvider.md ./docs/guides/RedisServiceProvider.md
 

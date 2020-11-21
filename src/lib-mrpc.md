@@ -1,5 +1,6 @@
 
-# lib-mrpc
+# Abount lib-mrpc
+
 
 ## Overview
 
@@ -56,11 +57,13 @@ When an endpoint is called, it will run within the same process.
 
 - `ImmediateServiceProvider`:
 	Service `Endpoints` are called synchronously and executed immediately.
+
 - `DeferredServiceProvider`:
 	Service `Endpoints` are called asynchronously and their execution is queued until the end of
 	Node's main processing loop.
 	While this provider offers asynchronous execution, all processing is still done within Node's
 	main processing loop and does not present a multi-threaded solution.
+
 - `WorkerThreadServiceProvider`: Service `Endpoints` are called asynchronously and their execution
 	is performed on a worker thread.
 	This provider does present a full asynchronous and multi-threaded solution.
@@ -72,8 +75,11 @@ Local service providers may store `Endpoints` within a different process as the 
 but transport messages (requests and replies) using local system (os) resources.
 
 - `FSWatchServiceProvider`: Uses Node's `fs` library to communicate via a shared file system folder.
+
 - `CommandLineServiceProvider`: (***Not Implemented***)
+
 - `ClusterServiceProvider`: (***Not Implemented***)
+
 - `ChildProcessServiceProvider`: (***Not Implemented***)
 
 
@@ -86,7 +92,9 @@ underlying transport mechanism.
 ***Web Sockets***
 
 - `HttpGetServiceProvider`: (***Not Implemented***)
+
 - `HttpPostServiceProvider`: (***Not Implemented***)
+
 - `SocketIOServiceProvider`: (***Not Implemented***)
 
 ***Message Queues***
@@ -95,15 +103,18 @@ underlying transport mechanism.
 	Service `Endpoints` are invoked remotely via a message queue supporting the [amqp](https://www.amqp.org/) v0.9.1 protocol.
 	Requires the [amqplib/amqp.node](https://github.com/squaremo/amqp.node) third-party library.
 	Tested with [RabbitMQ](https://www.rabbitmq.com/).
+
 - `TortoiseServiceProvider` : 
 	Service `Endpoints` are invoked remotely via a message broker supporting the [amqp](https://www.amqp.org/) v0.9.1 protocol.
 	Requires the [tortoise](https://github.com/CompassPHS/tortoise) third-party library.
 	Tested with [RabbitMQ](https://www.rabbitmq.com/).
-- `StompServiceProvider` : (***Document Here***)
+
+- `StompServiceProvider` : (***Unfinished***)
 
 ***General Pub/Sub***
 
 - `RedisServiceProvider` : (***Document Here***)
+
 - `MongoDBServiceProvider` : (***Not Implemented***)
 
 

@@ -21,8 +21,8 @@ let Options =
 */
 
 
-exports.StompServiceProvider =
-	function StompServiceProvider( ServiceName, Options )
+exports.StompitServiceProvider =
+	function StompitServiceProvider( ServiceName, Options )
 	{
 		return {
 
