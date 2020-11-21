@@ -40,7 +40,7 @@ service.OpenPort();
 // Define a function for the service.
 function multiply_function( Parameters )
 {
-	return Parameters.arg1 * Parameters.arg2;
+	return (Parameters.arg1 * Parameters.arg2);
 }
 
 // Add the function to your service.
@@ -54,7 +54,7 @@ console.log( '6 * 7 = ' +  result ); // 6 * 7 = 42
 
 ## Remote Functions
 
-This example takes the same functionality (a multiply function) and lets you 
+This example takes the same functionality (i.e. a multiply function) and lets you 
 call it remotely via a message queue server that supports the `amqp` protocol
 (e.g. [RabbitMQ](https://www.rabbitmq.com/)).
 Remoting the function has minimal impact on your code as all that is required
@@ -62,6 +62,7 @@ is to change the type of `ServiceProvider` that you use. The function signatures
 and mechanics are identical across all types of `ServiceProvider`.
 
 ***server.js***:
+
 ```javascript
 // Instantiate a ServiceProvider which listens for commands on a message queue server.
 const lib_mrpc = require( '@liquicode/lib-mrpc' );
@@ -69,21 +70,16 @@ let options = { server: 'amqp://my-rabbitmq' };
 let service = lib_mrpc.AmqpLibServiceProvider( 'My Service', options );
 service.OpenPort();
 
-// Define a function for the service.
-function multiply_function( Parameters )
-{
-	return Parameters.arg1 * Parameters.arg2;
-}
-
 // Add the Multiply function to our service.
 await service.AddEndpoint( 'Multiply',
 	( Parameters ) =>
 	{
-		return Parameters.arg1 * Parameters.arg2;
+		return (Parameters.arg1 * Parameters.arg2);
 	} );
 ```
 
 ***client.js***:
+
 ```javascript
 // Instantiate a connection to the server via the same message queue.
 const lib_mrpc = require( '@liquicode/lib-mrpc' );
@@ -91,7 +87,7 @@ let options = { server: 'amqp://my-rabbitmq' };
 let service = lib_mrpc.AmqpLibServiceProvider( 'My Service', options );
 service.OpenPort();
 
-// Call the service function. This code is identical regardless of which ServiceProvider begin used.
+// Call the service function. This code is identical regardless of which ServiceProvider being used.
 let result = await service.CallEndpoint( 'My Service', 'Multiply', { arg1: 6, arg2: 7 } );
 console.log( '6 * 7 = ' +  result ); // 6 * 7 = 42
 ```
@@ -99,13 +95,16 @@ console.log( '6 * 7 = ' +  result ); // 6 * 7 = 42
 
 ## Remoting Errors
 
-Just like any other function, `Endpoint`s can throw errors, intentional or otherwise.
+Just like any other function, an `Endpoint` can throw errors (intentional or otherwise).
 `lib-mrpc` catches these errors and then remotes them back to the calling function.
 
 The following example uses `RedisServiceProvider` to communicate with a remote service
 via an existing [redis](https://www.redis.io) server.
 
+In this case, rather than doing something tremendously useful in our `Endpoint`, we will just throw an error.
+
 ***server.js***:
+
 ```javascript
 const lib_mrpc = require( '@liquicode/lib-mrpc' );
 let service = lib_mrpc.RedisServiceProvider( 'My Service', { server: 'redis://my-redis' } );
@@ -119,6 +118,7 @@ await service.AddEndpoint(
 ```
 
 ***client.js***:
+
 ```javascript
 const lib_mrpc = require( '@liquicode/lib-mrpc' );
 let service = lib_mrpc.RedisServiceProvider( 'My Service', { server: 'redis://my-redis' } );
@@ -148,8 +148,6 @@ service.CallEndpoint( 'My Service', 'Gives Errors', {},
 		}
 	} );
 ```
-
-
 
 
 ## More Documentation
