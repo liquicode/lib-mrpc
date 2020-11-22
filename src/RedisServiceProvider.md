@@ -4,14 +4,14 @@
 
 ## Overview
 
-redis is an in-memory data structure store server which also has basic Pub/Sub capabilties.
+`redis` is an in-memory data structure store server which also has basic Pub/Sub capabilties.
 
-`lib-mrpc` utilizes the redis Pub/Sub functions to route commands and replies between
+`lib-mrpc` utilizes the `redis` pub/sub functions to route commands and replies between
 client and server instances of a `RedisServiceProvider` object.
 
-You can read more about the redis server here: [redis server](https://www.redis.io)
+- You can read more about the redis server here: [redis server](https://www.redis.io)
 
-Code and documentation for the redis npm package is here: [redis client](https://github.com/NodeRedis/node-redis)
+- Code and documentation for the redis npm package is here: [redis client](https://github.com/NodeRedis/node-redis)
 
 
 ## Installation
@@ -32,8 +32,9 @@ docker run -d -p 6379:6379 redis
 ```
 This will download and start a redis server on your machine (listening at port 6379).
 
-For information on docker, see here: [docker](https://www.docker.com/)
-The docker redis image is here: [docker redis](https://hub.docker.com/_/redis)
+- For information on docker, see here: [docker](https://www.docker.com/)
+
+- The docker redis image is here: [docker redis](https://hub.docker.com/_/redis)
 
 
 ## Usage
@@ -96,6 +97,6 @@ The `RedisServiceProvider` object implements all of the `ServiceProvider` method
 	- Creates a new channel to receive commands on and then subscribes to it.
 - `async function CallEndpoint( EndpointName, CommandParameters, CommandCallback = null )`
 	- Creates a reply channel to receive the command's response and then subscribes to it.
-	- Connects to the `Endpoint`'s command channel and then sends a command to the service.
+	- Connects to the `Endpoint` command channel and sends a command to the service.
 	- The reply channel is shut down as soon as it receives a reply.
 

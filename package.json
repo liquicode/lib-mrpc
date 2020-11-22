@@ -15,20 +15,20 @@
       "homepage": "http://liquicode.com"
     }
   ],
-  "main": "lib-mrpc.js",
+  "main": "src/lib-mrpc.js",
   "files": [
     "readme.md",
     "VERSION",
     "LICENSE",
     "lib-mrpc.js",
     "src/*",
+    "dist/*",
     "docs/*",
     "tests/*"
   ],
   "ignore": [
     ".*",
     "~*",
-    "*.dockerfile",
     "bower_components",
     "node_modules",
     "build"
@@ -43,32 +43,31 @@
     "message",
     "message broker",
     "thread",
+    "workerthread",
+    "redis",
+    "http",
+    "websocket",
     "amqp",
-    "stomp"
+    "stomp",
+    "mongo",
+    "mongodb"
   ],
   "dependencies": {},
   "devDependencies": {
     "@vivaxy/here": "^3.4.0",
     "amqplib": "^0.6.0",
-    "docdash": "^1.2.0",
-    "jsdoc": "^3.6.6",
     "mocha": "^7.1.2",
     "redis": "^3.0.2",
     "stompit": "^1.0.0",
     "tortoise": "^1.0.1",
-    "uniqid": "^5.2.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
-    "run-tests": "mocha -u bdd tests --timeout 0 --slow 0 --colors",
+    "run-tests": "mocha -u bdd tests/release --timeout 0 --slow 0 --colors",
     "run-build": "bash build/custom-build.sh",
     "run-docs-web-server": "npx here --directory docs --port 4200 --watch 1 --silent",
-    "010-webpack": "bash build/webpack/010-webpack.sh",
-    "020-gen-lib-docs": "node build/docs/020-gen-lib-docs.js ./docs ./src ./tests",
-    "021-gen-jsdoc-web": "npx jsdoc -c build/__secrets/jsdoc.config.json",
-    "022-gen-jsdoc-json": "npx jsdoc -c build/__secrets/jsdoc.config.json -X > docs/docs.json",
     "810-s3-sync-docs": "bash build/s3/810-s3-sync-docs.sh",
     "900-npm-publish-public": "bash build/npm/900-npm-publish-public.sh"
   }

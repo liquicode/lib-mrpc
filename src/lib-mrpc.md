@@ -92,12 +92,6 @@ but transport messages (requests and replies) using local system (os) resources.
 
 - `FSWatchServiceProvider`: Uses Node's `fs` library to communicate via a shared file system folder.
 
-- `CommandLineServiceProvider`: (***Not Implemented***)
-
-- `ClusterServiceProvider`: (***Not Implemented***)
-
-- `ChildProcessServiceProvider`: (***Not Implemented***)
-
 
 ### Remote Service Provders
 
@@ -105,13 +99,9 @@ Remote service providers may store code on a different machine from the calling 
 In many instances, these service providers require the inclusion of third-party libraries to implement the
 underlying transport mechanism.
 
+
 ***Web Sockets***
 
-- `HttpGetServiceProvider`: (***Not Implemented***)
-
-- `HttpPostServiceProvider`: (***Not Implemented***)
-
-- `SocketIOServiceProvider`: (***Not Implemented***)
 
 ***Message Queues***
 
@@ -125,18 +115,16 @@ underlying transport mechanism.
 	Requires the [tortoise](https://github.com/CompassPHS/tortoise) third-party library.
 	Tested with [RabbitMQ](https://www.rabbitmq.com/).
 
-- `StompServiceProvider` : (***Unfinished***)
 
 ***General Pub/Sub***
 
 - `RedisServiceProvider` : (***Document Here***)
 
-- `MongoDBServiceProvider` : (***Not Implemented***)
-
 
 ## ServiceClient
 
 - A client to manage and invoke remote services.
+- Can implement dependency injection and configuration at load time.
 - object `Services` : Stores connections to remote services.
 - function `ConnectService( Service )`
 	- Register a service that will be available.
@@ -150,19 +138,5 @@ underlying transport mechanism.
 	- string `EndpointName` : The name of the endpoint within the service.
 	- object `CommandParameters` : The parameters to pass to the endpoint function.
 	- function `CommandCallback` : The callback function used to report endpoint results.
-
-
-## Resources / References
-
-***Generators***
-
-- [Yield! Yield! How Generators work in JavaScript.](https://www.freecodecamp.org/news/yield-yield-how-generators-work-in-javascript-3086742684fc/)
-- [Trying to understand generators / yield in node.js - what executes the asynchronous function?](https://stackoverflow.com/questions/17516952/trying-to-understand-generators-yield-in-node-js-what-executes-the-asynchron)
-- [A Study on Solving Callbacks with JavaScript Generators](https://jlongster.com/A-Study-on-Solving-Callbacks-with-JavaScript-Generators)
-- [A Closer Look at Generators Without Promises](https://jlongster.com/A-Closer-Look-at-Generators-Without-Promises)
-
-***CSP Channels***
-
-- [Taming the Asynchronous Beast with CSP Channels in JavaScript](https://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript)
 
 

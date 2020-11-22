@@ -1,15 +1,14 @@
 "use strict";
 
 
-const LIB_MRPC = require( '../src/lib-mrpc.js' );
-const LIB_REDIS = require( '../src/RedisServiceProvider.js' );
+const LIB_MRPC = require( '../../src/lib-mrpc.js' );
 const LIB_ASSERT = require( 'assert' );
 
 var TestService = null;
 var TestClient = null;
 
 //---------------------------------------------------------------------
-describe( `61) Redis Tests`,
+describe( `03) WorkerThread Tests`,
 	function ()
 	{
 
@@ -17,7 +16,8 @@ describe( `61) Redis Tests`,
 		beforeEach(
 			async function ()
 			{
-				TestService = LIB_REDIS.RedisServiceProvider( 'Test Service' );
+				let options = {};
+				TestService = LIB_MRPC.WorkerThreadServiceProvider( 'Test Service', options );
 				await TestService.OpenPort();
 				// For remote ServiceProviders, client and service may share the same instance.
 				TestClient = TestService;
@@ -37,15 +37,29 @@ describe( `61) Redis Tests`,
 
 
 		//---------------------------------------------------------------------
-		it( `Echo Service`,
+		it( `Echo Value Service`,
 			async function ()
 			{
 				let {
 					install_service_endpoints,
 					run_tests,
-				} = require( './services/echo.js' );
+				} = require( '../services/echo-value.js' );
 				await install_service_endpoints( TestService );
-				await run_tests( TestClient, { iterations: 1000 } );
+				await run_tests( TestClient, { iterations: 10 } );
+				return;
+			} );
+
+
+		//---------------------------------------------------------------------
+		it( `Echo Error Service`,
+			async function ()
+			{
+				let {
+					install_service_endpoints,
+					run_tests,
+				} = require( '../services/echo-error.js' );
+				await install_service_endpoints( TestService );
+				await run_tests( TestClient, { iterations: 100 } );
 				return;
 			} );
 

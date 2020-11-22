@@ -163,13 +163,3 @@ service.CallEndpoint( 'My Service', 'Gives Errors', {},
 - [lib-mrpc Samples](https://github.com/liquicode/lib-mrpc/tree/master/samples)
 - [lib-mrpc Tests](https://github.com/liquicode/lib-mrpc/tree/master/tests)
 
-
-## TODO
-
-- Develop the `ServiceTransaction` object.
-	- `StartTransaction`: Begin aggregating calls to `Endpoint`s.
-	- `CommitTransaction`: Execute aggregated calls to `Endpoint`s.
-	- `RollbackTransaction`: Use `Undo` data to undo the effects of all service calls.
-- `WorkerThreadServiceProvider`:
-	- Use a thread pool so it doesn't just blindly consume all of the resources anyway.
-

@@ -1,15 +1,14 @@
 "use strict";
 
 
-const LIB_MRPC = require( '../src/lib-mrpc.js' );
-const LIB_TORTOISE = require( '../src/TortoiseServiceProvider.js' );
+const LIB_MRPC = require( '../../src/lib-mrpc.js' );
 const LIB_ASSERT = require( 'assert' );
 
 var TestService = null;
 var TestClient = null;
 
 //---------------------------------------------------------------------
-describe( `42) Tortoise Tests`,
+describe( `01) Immediate Tests`,
 	function ()
 	{
 
@@ -17,9 +16,9 @@ describe( `42) Tortoise Tests`,
 		beforeEach(
 			async function ()
 			{
-				TestService = LIB_TORTOISE.TortoiseServiceProvider( 'Test Service' );
-				await TestService.OpenPort();
-				// For remote ServiceProviders, client and service may share the same instance.
+				TestService = LIB_MRPC.ImmediateServiceProvider( 'Test Service', {} );
+				TestService.OpenPort();
+				// For native ServiceProviders, client and service must share the same instance.
 				TestClient = TestService;
 				return;
 			} );
@@ -29,7 +28,7 @@ describe( `42) Tortoise Tests`,
 		afterEach(
 			async function ()
 			{
-				await TestService.ClosePort();
+				TestService.ClosePort();
 				TestService = null;
 				TestClient = null;
 				return;
@@ -37,13 +36,27 @@ describe( `42) Tortoise Tests`,
 
 
 		//---------------------------------------------------------------------
-		it( `Echo Service`,
+		it( `Echo Value Service`,
 			async function ()
 			{
 				let {
 					install_service_endpoints,
 					run_tests,
-				} = require( './services/echo.js' );
+				} = require( '../services/echo-value.js' );
+				await install_service_endpoints( TestService );
+				await run_tests( TestClient, { iterations: 100 } );
+				return;
+			} );
+
+
+		//---------------------------------------------------------------------
+		it( `Echo Error Service`,
+			async function ()
+			{
+				let {
+					install_service_endpoints,
+					run_tests,
+				} = require( '../services/echo-error.js' );
 				await install_service_endpoints( TestService );
 				await run_tests( TestClient, { iterations: 100 } );
 				return;

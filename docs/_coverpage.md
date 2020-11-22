@@ -12,11 +12,13 @@
 
 > Utilize various ServiceProviders to fit multiple deployment scenarios
 
+> Supports 
+
 <hr>
 
 - Simple and lightweight (less than 20kb)
-- Minimal dependencies - Core is 100% JavaScript with No Dependencies
-- Easily scale functions using various mechanisms.
+- Minimal dependencies - Core is 100% JavaScript
+- Easily scale services over http, amqp, and more
 
 [GitHub](https://github.com/liquicode/lib-mrpc)
 [Get Started](guides/readme.md)

@@ -27,39 +27,71 @@ where `Endpoints` are executed:
 
 ## ServiceProvider Functions
 
+
+### ServiceProvider Constructor Functions
+
 - `function ServiceProvider( ServiceName, Options )`
 	- Constructor function of a ServiceProvider implementation.
 	- Returns a newly created instance of the requested service provider.
 	- `ServiceName`: A name for the service, shared by `Endpoint` code and calling code.
 	- `Options`: Implementation specific options. e.g. connection info, etc.
 
+
+### ServiceProvider Convenience Functions
+
+These are some convenience functions to be used by `ServiceProvider` implementations and user applications.
+
+- `function ApplyDefaultOptions( UserOptions )`
+
+- `function UniqueID( Size )`
+
+- `async function Sleep( Milliseconds )`
+
+- `async function WaitWhile( Condition )`
+
+- `async function WaitUntil( Condition )`
+
+
+### ServiceProvider Virtual Functions
+
+These functions are "overridden" by specific `ServiceProvider` implementations.
+
+- `function DefaultOptions()`
+	- Supply sensible defaults for the `ServiceProvider` Options object.
+
 - `async function OpenPort()`
-	- Performs any work needed to initialize the transport mechanism and begin receiving requests.
+	- Performs any work needed to initialize the transport mechanism and begin sending/receiving requests.
 	- This function does not return a value.
 	- It is reccomended to `await` for completion of this function.
+	- This function must be called prior to any calls to `AddEndpoint` or `CallEndpoint`.
 
 - `async function ClosePort()`
 	- Shuts down any transport mechanisms and releases any remaining resources.
+	- Also de-registers all `Endpoints`.
 	- This function does not return a value.
 	- It is reccomended to `await` for completion of this function.
 
 - `async function AddEndpoint( EndpointName, CommandFunction )`
 	- Used by "server" code to host callable `Endpoints`.
-	- `EndpointName`: The unique name of this endpoint within this service.
-	- `CommandFunction`: The function to execute when this endpoint is called.
+	- Function Parameters:
+		- `EndpointName`: The unique name of this endpoint within this service.
+		- `CommandFunction`: The function to execute when this endpoint is called.
 	- This function does not return a value.
 	- It is reccomended to `await` for completion of this function.
 
 - `async function CallEndpoint( EndpointName, CommandParameters, CommandCallback = null )`
 	- Used to invoke a (server) `Endpoint` by the (client) calling code.
-	- If this function is `await`ed, it will return whatever was returned from the invoked `Endpoint`.
-		Otherwise, the `Endpoint` reply can be obtained via the `CommandCallback` function.
-	- `EndpointName`: The name of the endpoint on this service to call.
-	- `CommandParameters`: The parameters to pass to the `Endpoint`.
-	- `CommandCallback`: A function to execute when the reply from the `Endpoint` has been received.
-		- The `CommandCallback` function should have the following signature: `function CommandCallback( Error, Reply )`.
-	- If `CommandCallback` is supplied and the function is also `await`ed on,
-		then `CommandCallback` will be executed first and then the function will complete.
+	- Function Parameters:
+		- `EndpointName`: The name of the endpoint on this service to call.
+		- `CommandParameters`: The parameters to pass to the `Endpoint`.
+		- `CommandCallback`: A function to execute when the reply from the `Endpoint` has been received.
+			- The `CommandCallback` function should have the following signature: `function CommandCallback( Error, Reply )`.
+	- If this function is `await`ed, the return value will be whatever was returned from the `Endpoint`.
+		Otherwise, the `Endpoint` results can be obtained via the `CommandCallback` callback function.
+	- If `CommandCallback` is supplied and the function is also `await`ed on, then `CommandCallback` will be executed first,
+		supplying any result or error obtained from the `Endpoint` to the callback code.
+		The function will then complete and return the `Endpoint` results or throw any errors from the `Endpoint`.
+
 
 ## ServiceProvider Flow
 

@@ -1,15 +1,14 @@
 "use strict";
 
 
-const LIB_MRPC = require( '../src/lib-mrpc.js' );
-const LIB_WORKER_THREAD = require( '../src/WorkerThreadServiceProvider.js' );
+const LIB_MRPC = require( '../../src/lib-mrpc.js' );
 const LIB_ASSERT = require( 'assert' );
 
 var TestService = null;
 var TestClient = null;
 
 //---------------------------------------------------------------------
-describe( `03) WorkerThread Tests`,
+describe( `41) AmqpLib Tests`,
 	function ()
 	{
 
@@ -17,8 +16,7 @@ describe( `03) WorkerThread Tests`,
 		beforeEach(
 			async function ()
 			{
-				let options = {};
-				TestService = LIB_WORKER_THREAD.WorkerThreadServiceProvider( 'Test Service', options );
+				TestService = LIB_MRPC.AmqpLibServiceProvider( 'Test Service' );
 				await TestService.OpenPort();
 				// For remote ServiceProviders, client and service may share the same instance.
 				TestClient = TestService;
@@ -38,13 +36,27 @@ describe( `03) WorkerThread Tests`,
 
 
 		//---------------------------------------------------------------------
-		it( `Echo Service`,
+		it( `Echo Value Service`,
 			async function ()
 			{
 				let {
 					install_service_endpoints,
 					run_tests,
-				} = require( './services/echo.js' );
+				} = require( '../services/echo-value.js' );
+				await install_service_endpoints( TestService );
+				await run_tests( TestClient, { iterations: 10 } );
+				return;
+			} );
+
+
+		//---------------------------------------------------------------------
+		it( `Echo Error Service`,
+			async function ()
+			{
+				let {
+					install_service_endpoints,
+					run_tests,
+				} = require( '../services/echo-error.js' );
 				await install_service_endpoints( TestService );
 				await run_tests( TestClient, { iterations: 100 } );
 				return;

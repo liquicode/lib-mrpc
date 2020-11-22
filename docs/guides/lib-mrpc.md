@@ -7,13 +7,29 @@
 A transport agnostic message based remote procedure call library designed to facilitate the
 evolution and scalability of complex systems.
 
-This library allows you to define a number of specific commands (`Endpoints`) that can be
-invoked, regardless of location, using a transport abstraction (`ServiceProvider`).
-An `Endpoint` represents a function that does specific work for an application.
+What this library offers is a base `ServiceProvider` class and a number of specific `ServiceProvider`
+implementations where each implementation utilizes a different transport mechanism to provide the
+library's remote procedure call functionality.
+Examples of different transport mechanisms include http gets and posts, message queues, pub/sub channels, etc.
 
-By abstracting the transport layer of the RPC, an application gains a great deal
+Each `ServiceProvider` allows you to define a number of named `Endpoints` that can be invoked by client code.
+Each endpoint has function associated with it and is called whenever the `Endpoint` is invoked.
+The function is passed a set of parameters and its return values and errors are to delivered back
+to the client calling code.
+The mechanics of packaging and unpackaging parameters, return values, and errors are handled by each
+`ServiceProvider` implementation.
+
+Almost every application of moderate complexity has to operate in and support more than one environment.
+Usually this is the development environment and the production environment.
+An application has to account for the differences between the two environments in a consistent manner.
+Often there will also be other environments that an application will need to contend with.
+Popular development strategies usually include environments used for testing, staging, limited releases, etc.
+The goal of this library is to easily allow applications to function consistently and gracefully across many
+different deployment environments.
+
+By abstracting the transport layer of remote procedure calls, an application gains a great deal
 of flexibility with regards to the way it can be developed and deployed.
-An application or system can start out small with well defined functional units.
+An application or system can start out small with a set of well defined functional units.
 While the system is small, it can be easily developed and debugged within a single development session.
 As the complexity of a system increases, development challenges arise when parts of a system
 need to be isolated and scaled.
@@ -76,12 +92,6 @@ but transport messages (requests and replies) using local system (os) resources.
 
 - `FSWatchServiceProvider`: Uses Node's `fs` library to communicate via a shared file system folder.
 
-- `CommandLineServiceProvider`: (***Not Implemented***)
-
-- `ClusterServiceProvider`: (***Not Implemented***)
-
-- `ChildProcessServiceProvider`: (***Not Implemented***)
-
 
 ### Remote Service Provders
 
@@ -89,13 +99,9 @@ Remote service providers may store code on a different machine from the calling 
 In many instances, these service providers require the inclusion of third-party libraries to implement the
 underlying transport mechanism.
 
+
 ***Web Sockets***
 
-- `HttpGetServiceProvider`: (***Not Implemented***)
-
-- `HttpPostServiceProvider`: (***Not Implemented***)
-
-- `SocketIOServiceProvider`: (***Not Implemented***)
 
 ***Message Queues***
 
@@ -109,18 +115,16 @@ underlying transport mechanism.
 	Requires the [tortoise](https://github.com/CompassPHS/tortoise) third-party library.
 	Tested with [RabbitMQ](https://www.rabbitmq.com/).
 
-- `StompServiceProvider` : (***Unfinished***)
 
 ***General Pub/Sub***
 
 - `RedisServiceProvider` : (***Document Here***)
 
-- `MongoDBServiceProvider` : (***Not Implemented***)
-
 
 ## ServiceClient
 
 - A client to manage and invoke remote services.
+- Can implement dependency injection and configuration at load time.
 - object `Services` : Stores connections to remote services.
 - function `ConnectService( Service )`
 	- Register a service that will be available.
@@ -134,19 +138,5 @@ underlying transport mechanism.
 	- string `EndpointName` : The name of the endpoint within the service.
 	- object `CommandParameters` : The parameters to pass to the endpoint function.
 	- function `CommandCallback` : The callback function used to report endpoint results.
-
-
-## Resources / References
-
-***Generators***
-
-- [Yield! Yield! How Generators work in JavaScript.](https://www.freecodecamp.org/news/yield-yield-how-generators-work-in-javascript-3086742684fc/)
-- [Trying to understand generators / yield in node.js - what executes the asynchronous function?](https://stackoverflow.com/questions/17516952/trying-to-understand-generators-yield-in-node-js-what-executes-the-asynchron)
-- [A Study on Solving Callbacks with JavaScript Generators](https://jlongster.com/A-Study-on-Solving-Callbacks-with-JavaScript-Generators)
-- [A Closer Look at Generators Without Promises](https://jlongster.com/A-Closer-Look-at-Generators-Without-Promises)
-
-***CSP Channels***
-
-- [Taming the Asynchronous Beast with CSP Channels in JavaScript](https://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript)
 
 

@@ -32,195 +32,276 @@ let Options =
 */
 
 
-exports.StompitServiceProvider =
-	function StompitServiceProvider( ServiceName, Options )
-	{
-		return {
+function StompitServiceProvider( ServiceName, Options )
+{
+
+	//---------------------------------------------------------------------
+	let service = LIB_SERVICE_PROVIDER.ServiceProvider( ServiceName, Options );
 
 
-			//---------------------------------------------------------------------
-			ServiceName: ServiceName,
-			Options: Options,
-			Endpoints: {},
-			QueueClient: null,
-			Messages: [],
+	//---------------------------------------------------------------------
+	service.QueueClient = null;
 
 
-			//---------------------------------------------------------------------
-			IsPortOpen: false,
-
-
-			// //---------------------------------------------------------------------
-			// process_next_message:
-			// 	async function process_next_message()
-			// 	{
-			// 		if ( !this.Messages.length ) { return; }
-			// 		// Dequeue the next message.
-			// 		let message = this.Messages[ 0 ];
-			// 		this.Messages = this.Messages.slice( 1 );
-			// 		// Invoke the endpoint.
-			// 		try
-			// 		{
-			// 			let result = await this.Endpoints[ message.EndpointName ].Handler( message.CommandParameters );
-			// 			message.CommandCallback( null, result );
-			// 		}
-			// 		catch ( error )
-			// 		{
-			// 			message.CommandCallback( error, null );
-			// 		}
-			// 		return;
-			// 	},
-
-
-			//---------------------------------------------------------------------
-			// A service opens a port to listen for connections.
-			OpenPort:
-				async function OpenPort()
+	//---------------------------------------------------------------------
+	service.DefaultOptions =
+		() =>
+		{
+			return {
+				host: 'localhost',
+				port: 61613,
+				timeout: 3000,
+				// path: null,
+				// ssl: false,
+				connectHeaders:
 				{
-					this.QueueClient = await LIB_STOMPIT.connect( this.Options );
-					this.IsPortOpen = true;
-					return;
+					host: 'localhost',
+					login: 'guest',
+					passcode: 'guest',
+					'accept-version': '1.0,1.1,1.2',
+					'heart-beat': '5000,5000',
 				},
+			};
+		};
 
 
-			//---------------------------------------------------------------------
-			// A service can close its port to stop listening for connections.
-			ClosePort:
-				async function ClosePort()
+
+	// //---------------------------------------------------------------------
+	// process_next_message:
+	// 	async function process_next_message()
+	// 	{
+	// 		if ( !service.Messages.length ) { return; }
+	// 		// Dequeue the next message.
+	// 		let message = service.Messages[ 0 ];
+	// 		service.Messages = service.Messages.slice( 1 );
+	// 		// Invoke the endpoint.
+	// 		try
+	// 		{
+	// 			let result = await service.Endpoints[ message.EndpointName ].Handler( message.CommandParameters );
+	// 			message.CommandCallback( null, result );
+	// 		}
+	// 		catch ( error )
+	// 		{
+	// 			message.CommandCallback( error, null );
+	// 		}
+	// 		return;
+	// 	},
+
+
+	//---------------------------------------------------------------------
+	service.OpenPort =
+		async () =>
+		{
+			return new Promise(
+				async ( resolve, reject ) => 
 				{
-					// this.QueueClient.close();
-					this.IsPortOpen = false;
-					let message_count = this.Messages.length;
-					if ( message_count > 0 )
+					// resolve( true );
+					LIB_STOMPIT.connect(
+						service.Options,
+						( error, client ) =>
+						{
+							if ( error )
+							{
+								console.error( 'StompitServiceProvider: connect error ' + error.message );
+								reject( error );
+								return;
+							}
+							service.QueueClient = client;
+							service.IsPortOpen = true;
+							resolve( true );
+						} );
+					return;
+				} );
+		};
+
+
+	//---------------------------------------------------------------------
+	service.ClosePort =
+		async () =>
+		{
+			return new Promise(
+				async ( resolve, reject ) => 
+				{
+					// Shutdown the endpoints.
+					let keys = Object.keys( service.EndpointManager.Endpoints );
+					for ( let index = 0; index < keys.length; index++ )
 					{
-						// throw new Error( `There are still [${message_count}] messages left in the queue.` );
-						console.warn( `The port was closed but there are still [${message_count}] messages left in the queue.` );
+						let endpoint = service.EndpointManager.Endpoints[ keys[ index ] ];
+						//TODO: await endpoint.Channel.disconnect();
 					}
+					// Disconnect.
+					if ( service.QueueClient )
+					{
+						await service.QueueClient.close();
+						service.QueueClient = null;
+					}
+					service.IsPortOpen = false;
+					// Complete the function.
+					resolve( true );
 					return;
-				},
+				} );
+		};
 
 
-			//---------------------------------------------------------------------
-			// A service has endpoints which can be called.
-			AddEndpoint:
-				async function AddEndpoint( EndpointName, CommandFunction ) 
+	//---------------------------------------------------------------------
+	service.AddEndpoint =
+		async ( EndpointName, CommandFunction ) =>
+		{
+			return new Promise(
+				async ( resolve, reject ) => 
 				{
 					// Make sure this endpoint doesn't already exist.
-					if ( typeof this.Endpoints[ EndpointName ] !== 'undefined' )
+					if ( service.EndpointManager.EndpointExists( EndpointName ) )
 					{
-						throw new Error( `The endpoint [${EndpointName}] already exists within [${this.ServiceName}].` );
+						reject( new Error( `The endpoint [${EndpointName}] already exists within [${service.ServiceName}].` ) );
+						return;
 					}
 					// Subscribe to the message queue.
-					let subscription = this.QueueClient.subscribe(
+					let queue_name = `/queue/${service.ServiceName}/${EndpointName}`;
+					let channel = service.QueueClient.subscribe(
 						{
-							destination: `/queue/${this.ServiceName}/${EndpointName}`,
+							destination: queue_name,
 							ack: 'client-individual'
 						},
-						function ( error, message )
+						async function ( error, message )
 						{
-							if ( error ) { throw new Error( `Queue subscription Error: ${error.message}` ); }
-							message.readString(
-								'utf-8',
-								function ( error, body )
-								{
-									if ( error ) { throw new Error( `Queue message read Error: ${error.message}` ); }
-									console.log( 'received message: ' + body );
-									try
-									{
-										CommandFunction( body );
-										message.ack();
-										// this.Client.ack( message );
-									}
-									catch ( error )
-									{
-										// this.Client.nack( error );
-										message.nack( error );
-									}
-									finally
-									{
-									}
-								} );
+							if ( error )
+							{
+								if ( message ) { message.nack( error ); }
+								throw new Error( `Queue subscription Error: ${error.message}` );
+							}
+							// message.readString(
+							// 	'utf-8',
+							// 	function ( error, body )
+							// 	{
+							// 		if ( error ) { throw new Error( `Queue message read Error: ${error.message}` ); }
+							// 		console.log( 'received message: ' + body );
+							// 		try
+							// 		{
+							// 			CommandFunction( body );
+							// 		}
+							// 		catch ( error )
+							// 		{
+							// 			console.error( Error.message, error );
+							// 			message.nack( error );
+							// 		}
+							// 		finally
+							// 		{
+							// 		}
+							// 		message.ack();
+							// 	} );
+							let message_string = await message.readString( 'utf-8' );
+							let request = JSON.parse( message_string );
+							let response =
+							{
+								ReplyID: request.ReplyID,
+								EndpointResult: null,
+								EndpointError: null,
+							};
+							try
+							{
+								response.EndpointResult = await service.EndpointManager.HandleEndpoint( request.EndpointName, request.CommandParameters );
+							}
+							catch ( error ) 
+							{
+								response.EndpointError = error.message;
+							}
+							if ( response.ReplyID )
+							{
+								let reply_queue_name = queue_name + `/${response.ReplyID}`;
+								const sendHeaders = {
+									destination: reply_queue_name,
+									'content-type': 'text/plain'
+								};
+								let frame = service.QueueClient.send( sendHeaders );
+								frame.write( JSON.stringify( response ) );
+								frame.end();
+							}
+							message.ack();
+							return;
 						} );
 					// Register the endpoint.
-					this.Endpoints[ EndpointName ] =
-					{
-						EndpointName: EndpointName,
-						Handler: CommandFunction,
-						Subscription: subscription,
-					};
-					// Return, OK.
+					let endpoint = service.EndpointManager.AddEndpoint( EndpointName, CommandFunction );
+					endpoint.Channel = channel;
+					// Complete the function.
+					resolve( true );
 					return;
-				},
-
-
-			//---------------------------------------------------------------------
-			DestroyEndpoint:
-				async function DestroyEndpoint( EndpointName ) 
-				{
-					if ( typeof this.Endpoints[ EndpointName ] === 'undefined' ) { return; }
-					// Disconnect the subscription.
-					this.Endpoints[ EndpointName ].Subscription.unsubscribe();
-					// Deregister the endpoint.
-					delete this.Endpoints[ EndpointName ];
-					// Remove any messages destined for this endpoint.
-
-					//TODO:
-
-					// Return, OK.
-					return;
-				},
-
-
-			//---------------------------------------------------------------------
-			CallEndpoint:
-				async function CallEndpoint( EndpointName, CommandParameters, CommandCallback ) 
-				{
-					// Validate that the endpoint exists.
-					if ( typeof this.Endpoints[ EndpointName ] === 'undefined' )
-					{
-						throw new Error( `The endpoint [${EndpointName}] does not exist within [${this.ServiceName}].` );
-					}
-					// Setup the reply channel
-					let reply_id = service.UniqueID();
-					let subscription = this.QueueClient.subscribe(
-						{
-							destination: `/queue/${this.ServiceName}/${EndpointName}/${reply_id}`,
-							ack: 'client-individual'
-						},
-						function ( error, message )
-						{
-							if ( error ) { throw new Error( `Queue reply subscription Error: ${error.message}` ); }
-							message.readString(
-								'utf-8',
-								function ( error, body )
-								{
-									if ( error ) { throw new Error( `Queue reply message read Error: ${error.message}` ); }
-									console.log( 'received reply message: ' + body );
-									CommandCallback( null, body );
-									message.ack();
-								} );
-						} );
-					// Build the message.
-					let message =
-					{
-						EndpointName: EndpointName,
-						CommandParameters: CommandParameters,
-						CommandCallback: reply_id,
-					};
-					// Queue the message.
-					const sendHeaders = {
-						destination: `/queue/${this.ServiceName}/${EndpointName}`,
-						'content-type': 'text/plain'
-					};
-					const frame = this.QueueClient.send( sendHeaders );
-					frame.write( JSON.stringify( message ) );
-					frame.end();
-					// Return, OK.
-					return;
-				},
-
+				} );
 		};
-		return;
-	};
 
+
+	//---------------------------------------------------------------------
+	service.CallEndpoint =
+		async function CallEndpoint( EndpointName, CommandParameters, CommandCallback ) 
+		{
+			// Validate that the endpoint exists.
+			if ( !service.EndpointManager.EndpointExists( EndpointName ) )
+			{
+				throw new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` );
+			}
+			// Setup the reply channel
+			let reply_id = service.UniqueID();
+			let reply_queue_name = `/queue/${service.ServiceName}/${EndpointName}/${reply_id}`;
+			let reply_channel = service.QueueClient.subscribe(
+				{
+					destination: reply_queue_name,
+					ack: 'client-individual'
+				},
+				async function ( error, message )
+				{
+					if ( error ) { throw new Error( `Queue reply subscription Error: ${error.message}` ); }
+					try
+					{
+						let message_string = message.readString( 'utf-8' );
+						let response = JSON.parse( message_string );
+						if ( response.EndpointError )
+						{
+							let error = new Error( response.EndpointError );
+							if ( CommandCallback ) { CommandCallback( error, null ); }
+							reject( error );
+						}
+						else
+						{
+							if ( CommandCallback ) { CommandCallback( null, response.EndpointResult ); }
+							resolve( response.EndpointResult );
+						}
+					}
+					catch ( error )
+					{
+						if ( CommandCallback ) { CommandCallback( error, null ); }
+						reject( error );
+					}
+					finally
+					{
+						reply_channel.close();
+					}
+					message.ack();
+				} );
+			// Build the message.
+			let message =
+			{
+				EndpointName: EndpointName,
+				CommandParameters: CommandParameters,
+				CommandCallback: reply_id,
+			};
+			// Queue the message.
+			const sendHeaders = {
+				destination: `/queue/${service.ServiceName}/${EndpointName}`,
+				'content-type': 'text/plain'
+			};
+			const frame = service.QueueClient.send( sendHeaders );
+			frame.write( JSON.stringify( message ) );
+			frame.end();
+			// Return, OK.
+			return;
+		};
+
+
+	//---------------------------------------------------------------------
+	service.Options = service.ApplyDefaultOptions( Options );
+	return service;
+};
+
+
+exports.StompitServiceProvider = StompitServiceProvider;
 

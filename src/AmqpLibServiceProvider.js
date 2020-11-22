@@ -115,7 +115,6 @@ function AmqpLibServiceProvider( ServiceName, Options )
 						return;
 					}
 					// Subscribe to the message queue.
-					// let This = this;
 					let queue_name = `${service.ServiceName}/${EndpointName}`;
 					let channel = await service.QueueClient.createChannel();
 					result_ok = await channel.prefetch( 1 );
@@ -196,8 +195,8 @@ function AmqpLibServiceProvider( ServiceName, Options )
 					let reply_id = service.UniqueID();
 					let reply_queue_name = `${service.ServiceName}/${EndpointName}/${reply_id}`;
 					let reply_channel = await service.QueueClient.createChannel();
-					await reply_channel.assertQueue( reply_queue_name, service.Options.reply_queue_options );
-					await reply_channel.consume(
+					result_ok = await reply_channel.assertQueue( reply_queue_name, service.Options.reply_queue_options );
+					result_ok = await reply_channel.consume(
 						reply_queue_name,
 						function ( message )
 						{
@@ -240,8 +239,8 @@ function AmqpLibServiceProvider( ServiceName, Options )
 					// Queue the message.
 					let queue_name = `${service.ServiceName}/${EndpointName}`;
 					let channel = await service.QueueClient.createChannel();
-					await channel.assertQueue( queue_name, service.Options.command_queue_options );
-					await channel.sendToQueue(
+					result_ok = await channel.assertQueue( queue_name, service.Options.command_queue_options );
+					result_ok = await channel.sendToQueue(
 						queue_name,
 						Buffer.from( JSON.stringify( message ) ),
 						{

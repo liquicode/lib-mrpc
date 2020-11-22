@@ -4,6 +4,7 @@
 const LIB_CRYPTO = require( "crypto" );
 
 
+//---------------------------------------------------------------------
 function EndpointManager()
 {
 	return {
