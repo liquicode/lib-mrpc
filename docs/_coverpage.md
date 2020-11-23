@@ -12,8 +12,6 @@
 
 > Utilize various ServiceProviders to fit multiple deployment scenarios
 
-> Supports 
-
 <hr>
 
 - Simple and lightweight (less than 20kb)
