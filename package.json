@@ -1,74 +1,74 @@
 {
-  "name": "@liquicode/lib-mrpc",
-  "version": "0.0.2",
-  "description": "A transport agnostic message based remote procedure call library designed to facilitate the evolution and scalability of complex systems.",
-  "license": "MIT",
-  "homepage": "http://lib-mrpc.liquicode.com",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/liquicode/lib-mrpc.git"
-  },
-  "authors": [
-    {
-      "name": "Andre' G. Bowlin",
-      "email": "agbowlin@gmail.com",
-      "homepage": "http://liquicode.com"
-    }
-  ],
-  "main": "src/lib-mrpc.js",
-  "files": [
-    "readme.md",
-    "VERSION",
-    "LICENSE",
-    "lib-mrpc.js",
-    "src/*",
-    "dist/*",
-    "docs/*",
-    "tests/*"
-  ],
-  "ignore": [
-    ".*",
-    "~*",
-    "bower_components",
-    "node_modules",
-    "build"
-  ],
-  "keywords": [
-    "javascript",
-    "js",
-    "nodejs",
-    "node",
-    "rpc",
-    "remote procedure call",
-    "message",
-    "message broker",
-    "thread",
-    "workerthread",
-    "redis",
-    "http",
-    "websocket",
-    "amqp",
-    "stomp",
-    "mongo",
-    "mongodb"
-  ],
-  "dependencies": {},
-  "devDependencies": {
-    "@vivaxy/here": "^3.4.0",
-    "amqplib": "^0.6.0",
-    "mocha": "^7.1.2",
-    "redis": "^3.0.2",
-    "stompit": "^1.0.0",
-    "tortoise": "^1.0.1",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
-    "webpack-node-externals": "^1.7.2"
-  },
-  "scripts": {
-    "run-tests": "mocha -u bdd tests/*.js --timeout 0 --slow 0 --colors",
-    "run-build": "bash build/custom-build.sh",
-    "run-docs-web-server": "npx here --directory docs --port 4200 --watch 1 --silent",
-    "810-s3-sync-docs": "bash build/s3/810-s3-sync-docs.sh",
+	"name": "@liquicode/lib-mrpc",
+	"version": "0.0.3",
+	"description": "A transport agnostic message based remote procedure call library designed to facilitate the evolution and scalability of complex systems.",
+	"license": "MIT",
+	"homepage": "http://lib-mrpc.liquicode.com",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/liquicode/lib-mrpc.git"
+	},
+	"authors": [
+		{
+			"name": "Andre' G. Bowlin",
+			"email": "agbowlin@gmail.com",
+			"homepage": "http://liquicode.com"
+		}
+	],
+	"main": "src/lib-mrpc.js",
+	"files": [
+		"readme.md",
+		"VERSION",
+		"LICENSE",
+		"lib-mrpc.js",
+		"src/*",
+		"dist/*",
+		"docs/*",
+		"tests/*"
+	],
+	"ignore": [
+		".*",
+		"~*",
+		"bower_components",
+		"node_modules",
+		"build"
+	],
+	"keywords": [
+		"javascript",
+		"js",
+		"nodejs",
+		"node",
+		"rpc",
+		"remote procedure call",
+		"message",
+		"message broker",
+		"thread",
+		"workerthread",
+		"redis",
+		"http",
+		"websocket",
+		"amqp",
+		"stomp",
+		"mongo",
+		"mongodb"
+	],
+	"dependencies": {},
+	"devDependencies": {
+		"@vivaxy/here": "^3.4.0",
+		"amqplib": "^0.6.0",
+		"mocha": "^7.1.2",
+		"redis": "^3.0.2",
+		"stompit": "^1.0.0",
+		"tortoise": "^1.0.1",
+		"webpack": "^4.43.0",
+		"webpack-cli": "^3.3.11",
+		"webpack-node-externals": "^1.7.2"
+	},
+	"scripts": {
+		"run-tests": "mocha -u bdd tests/*.js --timeout 0 --slow 0 --colors",
+		"run-build": "bash build/custom-build.sh",
+		"run-docs-web-server": "npx here --directory docs --port 4200 --watch 1 --silent",
+		"810-s3-sync-docs": "bash build/s3/810-s3-sync-docs.sh",
 		"910-release-version": "node build/custom/910-release-version.js"
-  }
+	}
 }

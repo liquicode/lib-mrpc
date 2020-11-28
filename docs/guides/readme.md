@@ -1,5 +1,5 @@
 
-# lib-mrpc (v0.0.2)
+# lib-mrpc (v0.0.3)
 
 A transport agnostic message based remote procedure call library designed to facilitate the
 evolution and scalability of complex systems.
