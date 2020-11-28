@@ -1,14 +1,14 @@
 "use strict";
 
 
-const LIB_MRPC = require( '../../src/lib-mrpc.js' );
+const LIB_MRPC = require( '../src/lib-mrpc.js' );
 const LIB_ASSERT = require( 'assert' );
 
 var TestService = null;
 var TestClient = null;
 
 //---------------------------------------------------------------------
-describe( `03) WorkerThread Tests`,
+describe( `42) Tortoise Tests`,
 	function ()
 	{
 
@@ -16,8 +16,7 @@ describe( `03) WorkerThread Tests`,
 		beforeEach(
 			async function ()
 			{
-				let options = {};
-				TestService = LIB_MRPC.WorkerThreadServiceProvider( 'Test Service', options );
+				TestService = LIB_MRPC.TortoiseServiceProvider( 'Test Service' );
 				await TestService.OpenPort();
 				// For remote ServiceProviders, client and service may share the same instance.
 				TestClient = TestService;
@@ -43,7 +42,7 @@ describe( `03) WorkerThread Tests`,
 				let {
 					install_service_endpoints,
 					run_tests,
-				} = require( '../services/echo-value.js' );
+				} = require( './services/echo-value.js' );
 				await install_service_endpoints( TestService );
 				await run_tests( TestClient, { iterations: 10 } );
 				return;
@@ -57,7 +56,7 @@ describe( `03) WorkerThread Tests`,
 				let {
 					install_service_endpoints,
 					run_tests,
-				} = require( '../services/echo-error.js' );
+				} = require( './services/echo-error.js' );
 				await install_service_endpoints( TestService );
 				await run_tests( TestClient, { iterations: 100 } );
 				return;

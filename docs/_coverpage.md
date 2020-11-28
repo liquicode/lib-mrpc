@@ -2,7 +2,7 @@
 
 ![logo](media/lib-mrpc-banner-640x128.png)
 
-# lib-mrpc <small>v 0.0.1</small>
+# lib-mrpc <small>(v0.0.2)</small>
 
 <hr>
 
@@ -23,9 +23,8 @@
 
 
 <!-- background image -->
-
 <!-- ![]() -->
 
 <!-- background color -->
-
-![color](#cceeff)
+<!-- ![color](#cceeff) -->
+<!-- ![color](#2980B9) -->

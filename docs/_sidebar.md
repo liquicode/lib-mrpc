@@ -1,10 +1,14 @@
 <!-- _sidebar.md -->
 
+<hr>
+
 - lib-mrpc Docs
 
 	- [Getting Started](guides/readme.md)
 	- [About lib-mrpc](guides/lib-mrpc.md)
 	- [ServiceProvider](guides/ServiceProvider.md)
+
+<hr>
 
 - Native Service Providers
 
@@ -22,3 +26,9 @@
 	- [StompitServiceProvider](guides/StompitServiceProvider.md)
 	- [TortoiseServiceProvider](guides/TortoiseServiceProvider.md)
 	- [RedisServiceProvider](guides/RedisServiceProvider.md)
+
+<hr>
+
+- Information
+
+	- [Testing Output](testing-output.md)

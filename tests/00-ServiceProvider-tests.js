@@ -1,8 +1,8 @@
 "use strict";
 
 
-const LIB_MRPC = require( '../../src/lib-mrpc.js' );
-const LIB_SERVICE_PROVIDER = require( '../../src/ServiceProvider.js' );
+const LIB_MRPC = require( '../src/lib-mrpc.js' );
+const LIB_SERVICE_PROVIDER = require( '../src/ServiceProvider.js' );
 const LIB_ASSERT = require( 'assert' );
 
 var TestService = null;

@@ -65,10 +65,10 @@
     "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
-    "run-tests": "mocha -u bdd tests/release --timeout 0 --slow 0 --colors",
+    "run-tests": "mocha -u bdd tests/*.js --timeout 0 --slow 0 --colors",
     "run-build": "bash build/custom-build.sh",
     "run-docs-web-server": "npx here --directory docs --port 4200 --watch 1 --silent",
     "810-s3-sync-docs": "bash build/s3/810-s3-sync-docs.sh",
-    "900-npm-publish-public": "bash build/npm/900-npm-publish-public.sh"
+		"910-release-version": "node build/custom/910-release-version.js"
   }
 }

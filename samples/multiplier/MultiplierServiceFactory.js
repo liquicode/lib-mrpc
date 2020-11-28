@@ -1,7 +1,7 @@
 'use strict';
 
 
-const LIB_MRPC = require( '../../src/lib-mrpc.js' );
+const LIB_MRPC = require( '../src/lib-mrpc.js' );
 
 const MULTIPLIER_SERVICE_NAME = 'test.multiplier';
 

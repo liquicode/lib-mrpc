@@ -1,14 +1,14 @@
 "use strict";
 
 
-const LIB_MRPC = require( '../../src/lib-mrpc.js' );
+const LIB_MRPC = require( '../src/lib-mrpc.js' );
 const LIB_ASSERT = require( 'assert' );
 
 var TestService = null;
 var TestClient = null;
 
 //---------------------------------------------------------------------
-describe( `41) AmqpLib Tests`,
+describe( `02) Deferred Tests`,
 	function ()
 	{
 
@@ -16,9 +16,9 @@ describe( `41) AmqpLib Tests`,
 		beforeEach(
 			async function ()
 			{
-				TestService = LIB_MRPC.AmqpLibServiceProvider( 'Test Service' );
-				await TestService.OpenPort();
-				// For remote ServiceProviders, client and service may share the same instance.
+				TestService = LIB_MRPC.DeferredServiceProvider( 'Test Service', {} );
+				TestService.OpenPort();
+				// For native ServiceProviders, client and service must share the same instance.
 				TestClient = TestService;
 				return;
 			} );
@@ -28,7 +28,7 @@ describe( `41) AmqpLib Tests`,
 		afterEach(
 			async function ()
 			{
-				await TestService.ClosePort();
+				TestService.ClosePort();
 				TestService = null;
 				TestClient = null;
 				return;
@@ -42,9 +42,9 @@ describe( `41) AmqpLib Tests`,
 				let {
 					install_service_endpoints,
 					run_tests,
-				} = require( '../services/echo-value.js' );
+				} = require( './services/echo-value.js' );
 				await install_service_endpoints( TestService );
-				await run_tests( TestClient, { iterations: 10 } );
+				await run_tests( TestClient, { iterations: 100 } );
 				return;
 			} );
 
@@ -56,7 +56,7 @@ describe( `41) AmqpLib Tests`,
 				let {
 					install_service_endpoints,
 					run_tests,
-				} = require( '../services/echo-error.js' );
+				} = require( './services/echo-error.js' );
 				await install_service_endpoints( TestService );
 				await run_tests( TestClient, { iterations: 100 } );
 				return;
