@@ -33,7 +33,7 @@ function ServiceProviderFactory( ProviderName, ServiceName, ProviderOptions )
 		return require( './FSWatchServiceProvider.js' ).FSWatchServiceProvider( ServiceName, ProviderOptions );
 	}
 
-	// Remote Service Providers
+	// Remote Service Providers - Message Queues
 	if ( ProviderName === 'AmqpLibServiceProvider' )
 	{
 		return require( './AmqpLibServiceProvider.js' ).AmqpLibServiceProvider( ServiceName, ProviderOptions );
@@ -42,6 +42,8 @@ function ServiceProviderFactory( ProviderName, ServiceName, ProviderOptions )
 	{
 		return require( './TortoiseServiceProvider.js' ).TortoiseServiceProvider( ServiceName, ProviderOptions );
 	}
+
+	// Remote Service Providers - Pub/Sub
 	if ( ProviderName === 'RedisServiceProvider' )
 	{
 		return require( './RedisServiceProvider.js' ).RedisServiceProvider( ServiceName, ProviderOptions );
