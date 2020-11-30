@@ -24,7 +24,8 @@
 		"src/*",
 		"dist/*",
 		"docs/*",
-		"tests/*"
+		"tests/*",
+		"samples/*"
 	],
 	"ignore": [
 		".*",

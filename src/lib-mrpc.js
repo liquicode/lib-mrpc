@@ -4,55 +4,78 @@
 //=====================================================================
 //=====================================================================
 //
-//		Native Service Providers
+//		Service Provider Factory
 //
 //=====================================================================
 //=====================================================================
 
 
-exports.ImmediateServiceProvider = ( ServiceName, Options ) => { return require( './ImmediateServiceProvider.js' ).ImmediateServiceProvider( ServiceName, Options ); };
-exports.DeferredServiceProvider = ( ServiceName, Options ) => { return require( './DeferredServiceProvider.js' ).DeferredServiceProvider( ServiceName, Options ); };
-exports.WorkerThreadServiceProvider = ( ServiceName, Options ) => { return require( './WorkerThreadServiceProvider.js' ).WorkerThreadServiceProvider( ServiceName, Options ); };
+exports.ServiceProviderFactory = ServiceProviderFactory;
+function ServiceProviderFactory( ProviderName, ServiceName, ProviderOptions )
+{
+	// Native Service Providers
+	if ( ProviderName === 'ImmediateServiceProvider' )
+	{
+		return require( './ImmediateServiceProvider.js' ).ImmediateServiceProvider( ServiceName, ProviderOptions );
+	}
+	if ( ProviderName === 'DeferredServiceProvider' )
+	{
+		return require( './DeferredServiceProvider.js' ).DeferredServiceProvider( ServiceName, ProviderOptions );
+	}
+	if ( ProviderName === 'WorkerThreadServiceProvider' )
+	{
+		return require( './WorkerThreadServiceProvider.js' ).WorkerThreadServiceProvider( ServiceName, ProviderOptions );
+	}
+
+	// Local Service Providers
+	if ( ProviderName === 'FSWatchServiceProvider' )
+	{
+		return require( './FSWatchServiceProvider.js' ).FSWatchServiceProvider( ServiceName, ProviderOptions );
+	}
+
+	// Remote Service Providers
+	if ( ProviderName === 'AmqpLibServiceProvider' )
+	{
+		return require( './AmqpLibServiceProvider.js' ).AmqpLibServiceProvider( ServiceName, ProviderOptions );
+	}
+	if ( ProviderName === 'TortoiseServiceProvider' )
+	{
+		return require( './TortoiseServiceProvider.js' ).TortoiseServiceProvider( ServiceName, ProviderOptions );
+	}
+	if ( ProviderName === 'RedisServiceProvider' )
+	{
+		return require( './RedisServiceProvider.js' ).RedisServiceProvider( ServiceName, ProviderOptions );
+	}
+
+	// Unknown.
+	return null;
+};
 
 
 //=====================================================================
 //=====================================================================
 //
-//		Local Service Providers
+//		Service Providers (Strongly Typed)
 //
 //=====================================================================
 //=====================================================================
 
 
-exports.FSWatchServiceProvider = ( ServiceName, Options ) => { return require( './FSWatchServiceProvider.js' ).FSWatchServiceProvider( ServiceName, Options ); };
+// Native Service Providers
+exports.ImmediateServiceProvider = ( ServiceName, ProviderOptions ) => { return ServiceProviderFactory( 'ImmediateServiceProvider', ServiceName, ProviderOptions ); };
+exports.DeferredServiceProvider = ( ServiceName, ProviderOptions ) => { return ServiceProviderFactory( 'DeferredServiceProvider', ServiceName, ProviderOptions ); };
+exports.WorkerThreadServiceProvider = ( ServiceName, ProviderOptions ) => { return ServiceProviderFactory( 'WorkerThreadServiceProvider', ServiceName, ProviderOptions ); };
 
+// Local Service Providers
+exports.FSWatchServiceProvider = ( ServiceName, ProviderOptions ) => { return ServiceProviderFactory( 'FSWatchServiceProvider', ServiceName, ProviderOptions ); };
 
-//=====================================================================
-//=====================================================================
-//
-//		Remote Service Providers
-//			- Message Queues
-//
-//=====================================================================
-//=====================================================================
+// Remote Service Providers - Message Queues
+exports.AmqpLibServiceProvider = ( ServiceName, ProviderOptions ) => { return ServiceProviderFactory( 'AmqpLibServiceProvider', ServiceName, ProviderOptions ); };
+exports.TortoiseServiceProvider = ( ServiceName, ProviderOptions ) => { return ServiceProviderFactory( 'TortoiseServiceProvider', ServiceName, ProviderOptions ); };
+// exports.StompitServiceProvider = ( ServiceName, ProviderOptions ) => { return ServiceFactory( 'StompitServiceProvider', ServiceName, ProviderOptions ); };
 
-
-exports.AmqpLibServiceProvider = ( ServiceName, Options ) => { return require( './AmqpLibServiceProvider.js' ).AmqpLibServiceProvider( ServiceName, Options ); };
-exports.TortoiseServiceProvider = ( ServiceName, Options ) => { return require( './TortoiseServiceProvider.js' ).TortoiseServiceProvider( ServiceName, Options ); };
-// exports.StompitServiceProvider = ( ServiceName, Options ) => { return require( './StompitServiceProvider.js' ).StompitServiceProvider( ServiceName, Options ); };
-
-
-//=====================================================================
-//=====================================================================
-//
-//		Remote Service Providers
-//			- Pub/Sub
-//
-//=====================================================================
-//=====================================================================
-
-
-exports.RedisServiceProvider = ( ServiceName, Options ) => { return require( './RedisServiceProvider.js' ).RedisServiceProvider( ServiceName, Options ); };
+// Remote Service Providers - Pub/Sub
+exports.RedisServiceProvider = ( ServiceName, ProviderOptions ) => { return ServiceProviderFactory( 'RedisServiceProvider', ServiceName, ProviderOptions ); };
 
 
 //=====================================================================
