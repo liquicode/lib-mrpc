@@ -1,6 +1,6 @@
 {
 	"name": "@liquicode/lib-mrpc",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "A transport agnostic message based remote procedure call library designed to facilitate the evolution and scalability of complex systems.",
 	"license": "MIT",
 	"homepage": "http://lib-mrpc.liquicode.com",
