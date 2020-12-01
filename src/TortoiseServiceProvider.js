@@ -172,12 +172,6 @@ function TortoiseServiceProvider( ServiceName, Options )
 			return new Promise(
 				async ( resolve, reject ) => 
 				{
-					// Validate that the endpoint exists.
-					if ( !service.EndpointManager.EndpointExists( EndpointName ) )
-					{
-						reject( new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` ) );
-						return;
-					}
 					// Setup the reply channel
 					let reply_id = service.UniqueID();
 					let channel = await service.QueueClient

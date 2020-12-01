@@ -187,11 +187,6 @@ function AmqpLibServiceProvider( ServiceName, Options )
 				async ( resolve, reject ) => 
 				{
 					let result_ok = null;
-					// Validate that the endpoint exists.
-					if ( !service.EndpointManager.EndpointExists( EndpointName ) )
-					{
-						throw new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` );
-					}
 					// Setup the reply channel
 					let reply_id = service.UniqueID();
 					let reply_queue_name = `${service.ServiceName}/${EndpointName}/${reply_id}`;

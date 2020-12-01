@@ -235,11 +235,6 @@ function StompitServiceProvider( ServiceName, Options )
 	service.CallEndpoint =
 		async function CallEndpoint( EndpointName, CommandParameters, CommandCallback ) 
 		{
-			// Validate that the endpoint exists.
-			if ( !service.EndpointManager.EndpointExists( EndpointName ) )
-			{
-				throw new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` );
-			}
 			// Setup the reply channel
 			let reply_id = service.UniqueID();
 			let reply_queue_name = `/queue/${service.ServiceName}/${EndpointName}/${reply_id}`;

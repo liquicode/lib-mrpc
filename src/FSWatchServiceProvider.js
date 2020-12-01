@@ -154,12 +154,6 @@ function FSWatchServiceProvider( ServiceName, Options )
 			return new Promise(
 				async ( resolve, reject ) => 
 				{
-					// Validate that the endpoint exists.
-					if ( !service.EndpointManager.EndpointExists( EndpointName ) )
-					{
-						reject( new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` ) );
-						return;
-					}
 					// Initiate a file watcher for reply files.
 					let command_path = LIB_PATH.resolve( service.Options.path );
 					command_path = LIB_PATH.join( command_path, service.ServiceName );

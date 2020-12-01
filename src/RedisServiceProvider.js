@@ -152,12 +152,6 @@ function RedisServiceProvider( ServiceName, Options )
 			return new Promise(
 				async ( resolve, reject ) => 
 				{
-					// Validate that the endpoint exists.
-					if ( !service.EndpointManager.EndpointExists( EndpointName ) )
-					{
-						reject( new Error( `The endpoint [${EndpointName}] does not exist within [${service.ServiceName}].` ) );
-						return;
-					}
 					// Setup the reply channel
 					let reply_id = service.UniqueID();
 					let reply_queue_name = `${service.ServiceName}/${EndpointName}/${reply_id}`;
