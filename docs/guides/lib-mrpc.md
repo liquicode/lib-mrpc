@@ -132,7 +132,7 @@ underlying transport mechanism.
 - function `DisconnectService( ServiceName )`
 	- Deregister an available service.
 	- string `ServiceName` : The name of the service to disconnect.
-- function `CallEndpoint( ServiceName, EndpointName, CommandParameters, CommandCallback )`
+- async function `CallEndpoint( ServiceName, EndpointName, CommandParameters, CommandCallback )`
 	- Invoke an endpoint available in this service.
 	- string `ServiceName` : The name of the service containing the endpoint.
 	- string `EndpointName` : The name of the endpoint within the service.
