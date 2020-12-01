@@ -10,8 +10,9 @@ try
 }
 catch ( error ) 
 {
-	console.error( 'The npm library [amqplib] was not found.' );
-	console.error( 'To install [amqplib] please use: npm install --save amqplib' );
+	console.error( 'LIB-MRPC: An npm library required for this service provider [AmqpLibServiceProvider] was not found.' );
+	console.error( 'LIB-MRPC: The npm library [amqplib] was not found.' );
+	console.error( 'LIB-MRPC: To install [amqplib] please use: npm install --save amqplib' );
 	throw error;
 }
 

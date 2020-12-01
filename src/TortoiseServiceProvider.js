@@ -10,8 +10,9 @@ try
 }
 catch ( error ) 
 {
-	console.error( 'The npm library [tortoise] was not found.' );
-	console.error( 'To install [tortoise] please use: npm install --save tortoise' );
+	console.error( 'LIB-MRPC: An npm library required for this service provider [TortoiseServiceProvider] was not found.' );
+	console.error( 'LIB-MRPC: The npm library [tortoise] was not found.' );
+	console.error( 'LIB-MRPC: To install [tortoise] please use: npm install --save tortoise' );
 	throw error;
 }
 

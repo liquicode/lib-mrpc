@@ -10,8 +10,9 @@ try
 }
 catch ( error ) 
 {
-	console.error( 'The npm library [redis] was not found.' );
-	console.error( 'To install [redis] please use: npm install --save redis' );
+	console.error( 'LIB-MRPC: An npm library required for this service provider [RedisServiceProvider] was not found.' );
+	console.error( 'LIB-MRPC: The npm library [redis] was not found.' );
+	console.error( 'LIB-MRPC: To install [redis] please use: npm install --save redis' );
 	throw error;
 }
 
