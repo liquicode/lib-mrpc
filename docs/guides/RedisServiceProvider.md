@@ -100,3 +100,10 @@ The `RedisServiceProvider` object implements all of the `ServiceProvider` method
 	- Connects to the `Endpoint` command channel and sends a command to the service.
 	- The reply channel is shut down as soon as it receives a reply.
 
+
+## Notes
+
+- Getting error: `AbortError: Ready check failed: Redis connection lost and command aborted. It might have been processed.`
+	- I got this when repeatedly calling (unawaited) `CallEndpoint()` a large number of times in rapid succession.
+	- There is a [Github Issue](https://github.com/NodeRedis/node-redis/issues/1533) regarding this which reccomends not using a Docker version of Redis.
+
