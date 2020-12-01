@@ -2,7 +2,7 @@
 
 ![logo](media/lib-mrpc-banner-640x128.png)
 
-# lib-mrpc <small>(v0.0.4)</small>
+# lib-mrpc <small>(v0.0.5)</small>
 
 <hr>
 
