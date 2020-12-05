@@ -4,31 +4,35 @@
 
 - lib-mrpc Docs
 
-	- [Getting Started](guides/readme.md)
+	- [Getting Started](external/readme.md)
 	- [About lib-mrpc](guides/lib-mrpc.md)
-	- [ServiceProvider](guides/ServiceProvider.md)
 
 <hr>
 
-- Native Service Providers
+- Library API
 
-	- [ImmediateServiceProvider](guides/ImmediateServiceProvider.md)
-	- [DeferredServiceProvider](guides/DeferredServiceProvider.md)
-	- [WorkerThreadServiceProvider](guides/WorkerThreadServiceProvider.md)
+	- [ServiceProvider](api/ServiceProvider.md)
 
-- Local Service Providers
+	- Native Service Providers
 
-	- [FSWatchServiceProvider](guides/FSWatchServiceProvider.md)
+		- [ImmediateServiceProvider](api/ImmediateServiceProvider.md)
+		- [DeferredServiceProvider](api/DeferredServiceProvider.md)
+		- [WorkerThreadServiceProvider](api/WorkerThreadServiceProvider.md)
 
-- Remote Service Providers
+	- Local Service Providers
 
-	- [AmqpLibServiceProvider](guides/AmqpLibServiceProvider.md)
-	- [StompitServiceProvider](guides/StompitServiceProvider.md)
-	- [TortoiseServiceProvider](guides/TortoiseServiceProvider.md)
-	- [RedisServiceProvider](guides/RedisServiceProvider.md)
+		- [FSWatchServiceProvider](api/FSWatchServiceProvider.md)
+
+	- Remote Service Providers
+
+		- [AmqpLibServiceProvider](api/AmqpLibServiceProvider.md)
+		- [StompitServiceProvider](api/StompitServiceProvider.md)
+		- [TortoiseServiceProvider](api/TortoiseServiceProvider.md)
+		- [RedisServiceProvider](api/RedisServiceProvider.md)
 
 <hr>
 
 - Information
 
-	- [Testing Output](testing-output.md)
+	- [Testing Output](external/testing-output.md)
+	- [Software License](external/license.md)

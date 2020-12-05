@@ -2,7 +2,7 @@
 # StompitServiceProvider
 
 
-***Kinda non-functional at the moment.***
+***Kinda non-functional at the moment !!!***
 
 
 

@@ -19,7 +19,7 @@
 - Easily scale services over http, amqp, and more
 
 [GitHub](https://github.com/liquicode/lib-mrpc)
-[Get Started](guides/readme.md)
+[Get Started](external/readme.md)
 
 
 <!-- background image -->

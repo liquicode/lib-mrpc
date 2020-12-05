@@ -19,7 +19,7 @@
 	"files": [
 		"readme.md",
 		"VERSION",
-		"LICENSE",
+		"license.md",
 		"lib-mrpc.js",
 		"src/*",
 		"dist/*",
