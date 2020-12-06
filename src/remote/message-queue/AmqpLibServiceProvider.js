@@ -1,23 +1,23 @@
 'use strict';
 
 
-const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
+const LIB_SERVICE_PROVIDER = require( '../../ServiceProvider' );
 
-var LIB_REDIS = null;
+var LIB_AMQPLIB = null;
 try
 {
-	LIB_REDIS = require( 'redis' );
+	LIB_AMQPLIB = require( 'amqplib' );
 }
 catch ( error ) 
 {
-	console.error( 'LIB-MRPC: An npm library required for this service provider [RedisServiceProvider] was not found.' );
-	console.error( 'LIB-MRPC: The npm library [redis] was not found.' );
-	console.error( 'LIB-MRPC: To install [redis] please use: npm install --save redis' );
+	console.error( 'LIB-MRPC: An npm library required for this service provider [AmqpLibServiceProvider] was not found.' );
+	console.error( 'LIB-MRPC: The npm library [amqplib] was not found.' );
+	console.error( 'LIB-MRPC: To install [amqplib] please use: npm install --save amqplib' );
 	throw error;
 }
 
 
-function RedisServiceProvider( ServiceName, Options )
+function AmqpLibServiceProvider( ServiceName, Options )
 {
 
 	//---------------------------------------------------------------------
@@ -25,25 +25,46 @@ function RedisServiceProvider( ServiceName, Options )
 
 
 	//---------------------------------------------------------------------
+	service.QueueClient = null;
+
+
+	//---------------------------------------------------------------------
 	service.DefaultOptions =
 		() =>
 		{
 			return {
-				host: null,
-				port: null,
-				path: null,
-				url: 'redis://localhost:6379',
+				server: 'amqp://guest:guest@localhost:5672',
+				connect_options:
+				{
+					connectRetries: 30,
+					connectRetryInterval: 1000,
+				},
+				command_queue_options:
+				{
+					exclusive: false,
+					durable: false,
+					autoDelete: true,
+				},
+				reply_queue_options:
+				{
+					exclusive: false,
+					durable: false,
+					autoDelete: true,
+				},
 			};
 		};
 
 
 	//---------------------------------------------------------------------
 	service.OpenPort =
-		async () =>
+		async () => 
 		{
 			return new Promise(
 				async ( resolve, reject ) => 
 				{
+					service.QueueClient = await LIB_AMQPLIB.connect(
+						service.Options.server,
+						service.Options.connect_options );
 					service.IsPortOpen = true;
 					// Complete the function.
 					resolve( true );
@@ -54,7 +75,7 @@ function RedisServiceProvider( ServiceName, Options )
 
 	//---------------------------------------------------------------------
 	service.ClosePort =
-		async () =>
+		async () => 
 		{
 			return new Promise(
 				async ( resolve, reject ) => 
@@ -64,15 +85,14 @@ function RedisServiceProvider( ServiceName, Options )
 					for ( let index = 0; index < keys.length; index++ )
 					{
 						let endpoint = service.EndpointManager.Endpoints[ keys[ index ] ];
-						endpoint.Channel.unsubscribe();
-						endpoint.Channel.quit();
+						await endpoint.Channel.close();
 					}
-					// // Disconnect.
-					// if ( service.RedisClient )
-					// {
-					// 	await service.RedisClient.quit();
-					// 	service.RedisClient = null;
-					// }
+					// Disconnect.
+					if ( service.QueueClient )
+					{
+						await service.QueueClient.close();
+						service.QueueClient = null;
+					}
 					service.IsPortOpen = false;
 					// Complete the function.
 					resolve( true );
@@ -88,6 +108,7 @@ function RedisServiceProvider( ServiceName, Options )
 			return new Promise(
 				async ( resolve, reject ) => 
 				{
+					let result_ok = null;
 					// Make sure this endpoint doesn't already exist.
 					if ( service.EndpointManager.EndpointExists( EndpointName ) )
 					{
@@ -96,13 +117,18 @@ function RedisServiceProvider( ServiceName, Options )
 					}
 					// Subscribe to the message queue.
 					let queue_name = `${service.ServiceName}/${EndpointName}`;
-					let channel = LIB_REDIS.createClient( service.Options );
-					channel.on( 'message',
-						async function ( channel, message )
+					let channel = await service.QueueClient.createChannel();
+					result_ok = await channel.prefetch( 1 );
+					result_ok = await channel.assertQueue( queue_name, service.Options.command_queue_options );
+					result_ok = await channel.consume(
+						queue_name,
+						async function ( message )
 						{
+							if ( !message ) { return; }
 							try
 							{
-								let request = JSON.parse( message );
+								let message_string = message.content.toString();
+								let request = JSON.parse( message_string );
 								let response =
 								{
 									ReplyID: request.ReplyID,
@@ -119,22 +145,30 @@ function RedisServiceProvider( ServiceName, Options )
 								}
 								if ( response.ReplyID )
 								{
-									let reply_queue_name = `${service.ServiceName}/${EndpointName}/${response.ReplyID}`;
-									let reply_channel = LIB_REDIS.createClient( service.Options );
-									reply_channel.publish( reply_queue_name, JSON.stringify( response ) );
-									reply_channel.quit();
+									let reply_queue_name = queue_name + `/${response.ReplyID}`;
+									let reply_channel = await service.QueueClient.createChannel();
+									result_ok = await reply_channel.assertQueue( reply_queue_name, service.Options.reply_queue_options );
+									result_ok = reply_channel.sendToQueue(
+										reply_queue_name,
+										Buffer.from( JSON.stringify( response ) ),
+										{
+											contentType: "text/plain",
+											// deliveryMode: 1,
+											persistent: false,
+										},
+									);
 								}
+								channel.ack( message );
 							}
 							catch ( error )
 							{
 								console.error( Error.message, error );
+								channel.nack( message, false, false );
 							}
 							finally
 							{
 							}
-							return;
 						} );
-					channel.subscribe( queue_name );
 					// Register the endpoint.
 					let endpoint = service.EndpointManager.AddEndpoint( EndpointName, CommandFunction );
 					endpoint.Channel = channel;
@@ -147,21 +181,26 @@ function RedisServiceProvider( ServiceName, Options )
 
 	//---------------------------------------------------------------------
 	service.CallEndpoint =
-		async ( EndpointName, CommandParameters, CommandCallback ) =>
+		async ( EndpointName, CommandParameters, CommandCallback = null ) =>
 		{
 			return new Promise(
 				async ( resolve, reject ) => 
 				{
+					let result_ok = null;
 					// Setup the reply channel
 					let reply_id = service.UniqueID();
 					let reply_queue_name = `${service.ServiceName}/${EndpointName}/${reply_id}`;
-					let reply_channel = LIB_REDIS.createClient( service.Options );
-					reply_channel.on( 'message',
-						function ( channel, message )
+					let reply_channel = await service.QueueClient.createChannel();
+					result_ok = await reply_channel.assertQueue( reply_queue_name, service.Options.reply_queue_options );
+					result_ok = await reply_channel.consume(
+						reply_queue_name,
+						function ( message )
 						{
+							if ( !message ) { return; }
 							try
 							{
-								let response = JSON.parse( message );
+								let message_string = message.content.toString();
+								let response = JSON.parse( message_string );
 								if ( response.EndpointError )
 								{
 									let error = new Error( response.EndpointError );
@@ -181,12 +220,11 @@ function RedisServiceProvider( ServiceName, Options )
 							}
 							finally
 							{
-								reply_channel.unsubscribe();
-								reply_channel.quit();
+								reply_channel.close();
 							}
-							return;
-						} );
-					reply_channel.subscribe( reply_queue_name );
+						},
+						{ noAck: true }
+					);
 					// Build the message.
 					let message =
 					{
@@ -196,10 +234,18 @@ function RedisServiceProvider( ServiceName, Options )
 					};
 					// Queue the message.
 					let queue_name = `${service.ServiceName}/${EndpointName}`;
-					let channel = LIB_REDIS.createClient( service.Options );
-					channel.publish( queue_name, JSON.stringify( message ) );
-					channel.quit();
-					return;
+					let channel = await service.QueueClient.createChannel();
+					result_ok = await channel.assertQueue( queue_name, service.Options.command_queue_options );
+					result_ok = await channel.sendToQueue(
+						queue_name,
+						Buffer.from( JSON.stringify( message ) ),
+						{
+							contentType: "text/plain",
+							// deliveryMode: 1,
+							persistent: false,
+						},
+					);
+					await channel.close();
 				} );
 		};
 
@@ -209,6 +255,4 @@ function RedisServiceProvider( ServiceName, Options )
 	return service;
 };
 
-
-exports.RedisServiceProvider = RedisServiceProvider;
-
+exports.AmqpLibServiceProvider = AmqpLibServiceProvider;

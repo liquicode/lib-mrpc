@@ -1,7 +1,7 @@
 'use strict';
 
 
-const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
+const LIB_SERVICE_PROVIDER = require( '../ServiceProvider' );
 
 
 function ImmediateServiceProvider( ServiceName, Options )

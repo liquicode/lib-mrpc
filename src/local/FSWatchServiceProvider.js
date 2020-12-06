@@ -1,7 +1,7 @@
 'use strict';
 
 
-const LIB_SERVICE_PROVIDER = require( './ServiceProvider' );
+const LIB_SERVICE_PROVIDER = require( '../ServiceProvider' );
 const LIB_OS = require( 'os' );
 const LIB_FS = require( 'fs' );
 const LIB_PATH = require( 'path' );

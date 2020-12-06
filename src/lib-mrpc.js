@@ -16,37 +16,37 @@ function ServiceProviderFactory( ProviderName, ServiceName, ProviderOptions )
 	// Native Service Providers
 	if ( ProviderName === 'ImmediateServiceProvider' )
 	{
-		return require( './ImmediateServiceProvider.js' ).ImmediateServiceProvider( ServiceName, ProviderOptions );
+		return require( './in-process/ImmediateServiceProvider.js' ).ImmediateServiceProvider( ServiceName, ProviderOptions );
 	}
 	if ( ProviderName === 'DeferredServiceProvider' )
 	{
-		return require( './DeferredServiceProvider.js' ).DeferredServiceProvider( ServiceName, ProviderOptions );
+		return require( './in-process/DeferredServiceProvider.js' ).DeferredServiceProvider( ServiceName, ProviderOptions );
 	}
 	if ( ProviderName === 'WorkerThreadServiceProvider' )
 	{
-		return require( './WorkerThreadServiceProvider.js' ).WorkerThreadServiceProvider( ServiceName, ProviderOptions );
+		return require( './in-process/WorkerThreadServiceProvider.js' ).WorkerThreadServiceProvider( ServiceName, ProviderOptions );
 	}
 
 	// Local Service Providers
 	if ( ProviderName === 'FSWatchServiceProvider' )
 	{
-		return require( './FSWatchServiceProvider.js' ).FSWatchServiceProvider( ServiceName, ProviderOptions );
+		return require( './local/FSWatchServiceProvider.js' ).FSWatchServiceProvider( ServiceName, ProviderOptions );
 	}
 
 	// Remote Service Providers - Message Queues
 	if ( ProviderName === 'AmqpLibServiceProvider' )
 	{
-		return require( './AmqpLibServiceProvider.js' ).AmqpLibServiceProvider( ServiceName, ProviderOptions );
+		return require( './remote/message-queue/AmqpLibServiceProvider.js' ).AmqpLibServiceProvider( ServiceName, ProviderOptions );
 	}
 	if ( ProviderName === 'TortoiseServiceProvider' )
 	{
-		return require( './TortoiseServiceProvider.js' ).TortoiseServiceProvider( ServiceName, ProviderOptions );
+		return require( './remote/message-queue/TortoiseServiceProvider.js' ).TortoiseServiceProvider( ServiceName, ProviderOptions );
 	}
 
 	// Remote Service Providers - Pub/Sub
 	if ( ProviderName === 'RedisServiceProvider' )
 	{
-		return require( './RedisServiceProvider.js' ).RedisServiceProvider( ServiceName, ProviderOptions );
+		return require( './remote/general-pubsub/RedisServiceProvider.js' ).RedisServiceProvider( ServiceName, ProviderOptions );
 	}
 
 	// Unknown.
