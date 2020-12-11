@@ -33,6 +33,16 @@ function ServiceProviderFactory( ProviderName, ServiceName, ProviderOptions )
 		return require( './local/FSWatchServiceProvider.js' ).FSWatchServiceProvider( ServiceName, ProviderOptions );
 	}
 
+	// Remote Service Providers - General Pub/Sub
+	if ( ProviderName === 'RedisServiceProvider' )
+	{
+		return require( './remote/general-pubsub/RedisServiceProvider.js' ).RedisServiceProvider( ServiceName, ProviderOptions );
+	}
+	if ( ProviderName === 'MongoDBServiceProvider' )
+	{
+		return require( './remote/general-pubsub/MongoDBServiceProvider.js' ).MongoDBServiceProvider( ServiceName, ProviderOptions );
+	}
+
 	// Remote Service Providers - Message Queues
 	if ( ProviderName === 'AmqpLibServiceProvider' )
 	{
@@ -41,12 +51,6 @@ function ServiceProviderFactory( ProviderName, ServiceName, ProviderOptions )
 	if ( ProviderName === 'TortoiseServiceProvider' )
 	{
 		return require( './remote/message-queue/TortoiseServiceProvider.js' ).TortoiseServiceProvider( ServiceName, ProviderOptions );
-	}
-
-	// Remote Service Providers - Pub/Sub
-	if ( ProviderName === 'RedisServiceProvider' )
-	{
-		return require( './remote/general-pubsub/RedisServiceProvider.js' ).RedisServiceProvider( ServiceName, ProviderOptions );
 	}
 
 	// Unknown.
@@ -78,6 +82,7 @@ exports.TortoiseServiceProvider = ( ServiceName, ProviderOptions ) => { return S
 
 // Remote Service Providers - Pub/Sub
 exports.RedisServiceProvider = ( ServiceName, ProviderOptions ) => { return ServiceProviderFactory( 'RedisServiceProvider', ServiceName, ProviderOptions ); };
+exports.MongoDBServiceProvider = ( ServiceName, ProviderOptions ) => { return ServiceProviderFactory( 'MongoDBServiceProvider', ServiceName, ProviderOptions ); };
 
 
 //=====================================================================

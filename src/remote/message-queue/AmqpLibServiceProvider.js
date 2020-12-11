@@ -47,7 +47,7 @@ function AmqpLibServiceProvider( ServiceName, Options )
 				},
 				reply_queue_options:
 				{
-					exclusive: false,
+					exclusive: true,
 					durable: false,
 					autoDelete: true,
 				},

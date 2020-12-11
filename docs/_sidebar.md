@@ -13,23 +13,29 @@
 
 	- [ServiceProvider](api/ServiceProvider.md)
 
-	- Native Service Providers
+	- In-Process Service Providers
 
-		- [ImmediateServiceProvider](api/ImmediateServiceProvider.md)
-		- [DeferredServiceProvider](api/DeferredServiceProvider.md)
-		- [WorkerThreadServiceProvider](api/WorkerThreadServiceProvider.md)
+		- [ImmediateServiceProvider](api/in-process/ImmediateServiceProvider.md)
+		- [DeferredServiceProvider](api/in-process/DeferredServiceProvider.md)
+		- [WorkerThreadServiceProvider](api/in-process/WorkerThreadServiceProvider.md)
 
 	- Local Service Providers
 
-		- [FSWatchServiceProvider](api/FSWatchServiceProvider.md)
+		- [FSWatchServiceProvider](api/local/FSWatchServiceProvider.md)
 
 	- Remote Service Providers
 
-		- [AmqpLibServiceProvider](api/AmqpLibServiceProvider.md)
-		- [StompitServiceProvider](api/StompitServiceProvider.md)
-		- [TortoiseServiceProvider](api/TortoiseServiceProvider.md)
-		- [RedisServiceProvider](api/RedisServiceProvider.md)
+		- General Pub/Sub
 
+			- [MongoDBServiceProvider](api/remote/general-pubsub/MongoDBServiceProvider.md)
+			- [RedisServiceProvider](api/remote/general-pubsub/RedisServiceProvider.md)
+
+		- Message Queues
+
+			- [AmqpLibServiceProvider](api/remote/message-queue/AmqpLibServiceProvider.md)
+			- [StompitServiceProvider](api/remote/message-queue/StompitServiceProvider.md)
+			- [TortoiseServiceProvider](api/remote/message-queue/TortoiseServiceProvider.md)
+		
 <hr>
 
 - Information

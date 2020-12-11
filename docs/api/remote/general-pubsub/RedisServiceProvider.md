@@ -2,7 +2,7 @@
 # RedisServiceProvider
 
 
-## Overview
+### Overview
 
 `redis` is an in-memory data structure store server which also has basic Pub/Sub capabilties.
 
@@ -10,11 +10,10 @@
 client and server instances of a `RedisServiceProvider` object.
 
 - You can read more about the redis server here: [redis server](https://www.redis.io)
-
 - Code and documentation for the redis npm package is here: [redis client](https://github.com/NodeRedis/node-redis)
 
 
-## Installation
+### Installation
 
 This `ServiceProvider` is included in the `@liquicode/lib-mrpc` package:
 ```bash
@@ -33,11 +32,10 @@ docker run -d -p 6379:6379 redis
 This will download and start a redis server on your machine (listening at port 6379).
 
 - For information on docker, see here: [docker](https://www.docker.com/)
-
 - The docker redis image is here: [docker redis](https://hub.docker.com/_/redis)
 
 
-## Usage
+### Usage
 
 ### Creating RedisServiceProvider Objects
 
@@ -57,7 +55,7 @@ parameter and an optional `Options` object in the second parameter.
 ```javascript
 // Gain a reference to the ServiceProvider constructor function.
 const lib_mrpc = require( '@liquicode/lib-mrpc' );
-// Create a new instance of the ServiceProvider (uses default option values).
+// Create a new instance of the ServiceProvider (uses default connection values).
 let service = lib_mrpc.RedisServiceProvider( 'My Service' );
 // Connect to the message broker (e.g. RabbitMQ server).
 await service.OpenPort();
@@ -85,7 +83,7 @@ await service.ClosePort();
 ```
 
 
-## Implementation
+### Implementation
 
 The `RedisServiceProvider` object implements all of the `ServiceProvider` methods.
 
@@ -101,7 +99,7 @@ The `RedisServiceProvider` object implements all of the `ServiceProvider` method
 	- The reply channel is shut down as soon as it receives a reply.
 
 
-## Notes
+### Notes
 
 - Getting error: `AbortError: Ready check failed: Redis connection lost and command aborted. It might have been processed.`
 	- I got this when repeatedly calling (unawaited) `CallEndpoint()` a large number of times in rapid succession.

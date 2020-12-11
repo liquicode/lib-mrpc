@@ -1,0 +1,12 @@
+{
+  "name": "queue-models",
+  "version": "0.0.1",
+  "description": "Implementation of various queue models and messaging patterns.",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Andre' G. Bowlin",
+  "dependencies": {
+    "amqplib": "^0.6.0",
+    "tortoise": "^1.0.1"
+  }
+}
