@@ -16,27 +16,31 @@
     ✓ Echo Error Service
 
   03) WorkerThread Tests
-    ✓ Echo Value Service (239ms)
-    ✓ Echo Error Service (2528ms)
+    ✓ Echo Value Service (242ms)
+    ✓ Echo Error Service (2546ms)
 
   21) FSWatch Tests
-    ✓ Echo Value Service (41ms)
-    ✓ Echo Error Service (39ms)
+    ✓ Echo Value Service (39ms)
+    ✓ Echo Error Service (40ms)
 
   41) AmqpLib Tests
-    ✓ Echo Value Service (315ms)
-    ✓ Echo Error Service (2266ms)
+    ✓ Echo Value Service (218ms)
+    ✓ Echo Error Service (2115ms)
 
   42) Tortoise Tests
-    ✓ Echo Value Service (349ms)
-    ✓ Echo Error Service (3521ms)
+    ✓ Echo Value Service (298ms)
+    ✓ Echo Error Service (3348ms)
 
   61) Redis Tests
-    ✓ Echo Value Service (27ms)
-    ✓ Echo Error Service (215ms)
+    ✓ Echo Value Service (28ms)
+    ✓ Echo Error Service (211ms)
+
+  62) MongoDB Tests
+    ✓ Echo Value Service (2428ms)
+    ✓ Echo Error Service (242ms)
 
 
-  15 passing (10s)
+  17 passing (12s)
 
 
 ```
