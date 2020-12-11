@@ -36,6 +36,7 @@ function MongoDBServiceProvider( ServiceName, Options )
 		() =>
 		{
 			return {
+				enable_service: false,
 				url: 'mongodb://localhost:27017',
 				options:
 				{
@@ -43,7 +44,7 @@ function MongoDBServiceProvider( ServiceName, Options )
 					useNewUrlParser: true,
 				},
 				database_name: '',
-				enable_service: false,
+				collection_name: '',
 				collection_size: 10 * ( 1024 * 1024 ),
 			};
 		};

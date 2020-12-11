@@ -75,17 +75,38 @@ await service.ClosePort();
 ***Default Options***
 ```javascript
 {
-	url: 'redis://localhost:6379',
-	options: {},
-	enable_service: false,
+	enable_service: false,						// Set to true to enable service processing, false for client only.
+	url: 'mongodb://localhost:27017',			// MongoDB connection string.
+	options:									// MongoDB connection options.
+	{
+		useUnifiedTopology: true,
+		useNewUrlParser: true,
+	},
+	database_name: '',							// Defaults to the service name.
+	collection_name: '',						// Defaults to the service name.
+	collection_size: 10 * ( 1024 * 1024 ),		// Size of capped collection in bytes.
 }
 ```
 
-- `url` and `options` parameters specified here:
-[http://mongodb.github.io/node-mongodb-native/3.6/api/MongoClient.html#.connect](http://mongodb.github.io/node-mongodb-native/3.6/api/MongoClient.html#.connect)
 - `enable_service`:
 	If `true`, then `MongoDBServiceProvider` will listen for commands being routed through the mongo database.
-	Otherwise, onlu client functionality will beavailable.
+	Otherwise, only client functionality will be available.
+- `url` and `options` parameters specified here:
+[http://mongodb.github.io/node-mongodb-native/3.6/api/MongoClient.html#.connect](http://mongodb.github.io/node-mongodb-native/3.6/api/MongoClient.html#.connect)
+- `database_name`:
+	Name of the database on the server to store the capped collection.
+	If not provided, this defaults to the service name.
+	If this database does not exist, then it is created.
+	The database name cannot contain spaces.
+	See [Naming Restrictions](https://docs.mongodb.com/manual/reference/limits/#restrictions-on-db-names) on MongoDB database names.
+- `collection_name`:
+	Name of the cappped collection in the database.
+	If not provided, this defaults to the service name.
+	If this collection does not exist, then it is created.
+	If this collection exists but is not capped, an error is thrown by `OpenPort`.
+- `collection_size`:
+	Size of capped collection in bytes.
+	Make sure the collection size is big enough to store all messages that mught be queued at any one time.
 
 
 The `MongoDBServiceProvider` takes advantage of MongoDB's [Tailable Cursors](https://docs.mongodb.com/manual/core/tailable-cursors/) feature.

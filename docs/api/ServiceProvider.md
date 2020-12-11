@@ -41,15 +41,20 @@ where `Endpoints` are executed:
 
 These are some convenience functions to be used by `ServiceProvider` implementations and user applications.
 
-- `function ApplyDefaultOptions( UserOptions )`
+- `function ApplyDefaultOptions( UserOptions )`:
+	This function is used internally by ServiceProvider constructurs to merge application supplied option values with default option values.
 
 - `function UniqueID( Size )`
+	Returns a unique identifier string of `Size` characters.
 
 - `async function Sleep( Milliseconds )`
+	Sleeps for a certain number of milliseconds.
 
 - `async function WaitWhile( Condition )`
+	Wait/sleep while a certain condition is `true`.
 
 - `async function WaitUntil( Condition )`
+	Wait/sleep until a certain condition is `true`.
 
 
 ### ServiceProvider Virtual Functions
