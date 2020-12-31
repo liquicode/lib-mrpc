@@ -2,7 +2,7 @@
 # RedisServiceProvider
 
 
-### Overview
+## Overview
 
 `redis` is an in-memory data structure store server which also has basic Pub/Sub capabilties.
 
@@ -13,7 +13,7 @@ client and server instances of a `RedisServiceProvider` object.
 - Code and documentation for the redis npm package is here: [redis client](https://github.com/NodeRedis/node-redis)
 
 
-### Installation
+## Installation
 
 This `ServiceProvider` is included in the `@liquicode/lib-mrpc` package:
 ```bash
@@ -35,7 +35,7 @@ This will download and start a redis server on your machine (listening at port 6
 - The docker redis image is here: [docker redis](https://hub.docker.com/_/redis)
 
 
-### Usage
+## Usage
 
 ### Creating RedisServiceProvider Objects
 
@@ -70,7 +70,7 @@ await service.ClosePort();
 ```
 
 
-### RedisServiceProvider Options
+## Options
 
 ***Default Options***
 ```javascript
@@ -83,7 +83,7 @@ await service.ClosePort();
 ```
 
 
-### Implementation
+## Implementation
 
 The `RedisServiceProvider` object implements all of the `ServiceProvider` methods.
 
@@ -99,7 +99,7 @@ The `RedisServiceProvider` object implements all of the `ServiceProvider` method
 	- The reply channel is shut down as soon as it receives a reply.
 
 
-### Notes
+## Notes
 
 - Getting error: `AbortError: Ready check failed: Redis connection lost and command aborted. It might have been processed.`
 	- I got this when repeatedly calling (unawaited) `CallEndpoint()` a large number of times in rapid succession.

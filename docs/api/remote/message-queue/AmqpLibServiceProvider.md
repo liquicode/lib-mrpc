@@ -20,6 +20,33 @@ Tested with [RabbitMQ](https://www.rabbitmq.com/).
 - Qpid
 
 
+### AmqpLibServiceProvider Options
+
+***Default Options***
+```javascript
+{
+	server: 'amqp://guest:guest@localhost:5672',
+	connect_options:
+	{
+		connectRetries: 30,
+		connectRetryInterval: 1000,
+	},
+	command_queue_options:
+	{
+		exclusive: false,
+		durable: false,
+		autoDelete: true,
+	},
+	reply_queue_options:
+	{
+		exclusive: true,
+		durable: false,
+		autoDelete: true,
+	},
+}
+```
+
+
 ## Resources
 
 - [amqplib/amqp.node library](https://github.com/squaremo/amqp.node)

@@ -2,7 +2,7 @@
 # MongoDBServiceProvider
 
 
-### Overview
+## Overview
 
 MongoDB is popular NoSql database.
 
@@ -13,7 +13,7 @@ client and server instances of a `MongoDBServiceProvider` object.
 - Code and documentation for the mongodb npm package is here: [mongodb client](https://www.npmjs.com/package/mongodb)
 
 
-### Installation
+## Installation
 
 This `ServiceProvider` is included in the `@liquicode/lib-mrpc` package:
 ```bash
@@ -35,7 +35,7 @@ This will download and start a mongodb server on your machine (listening at port
 - The docker mongodb image is here: [docker mongodb](https://hub.docker.com/_/mongo)
 
 
-### Usage
+## Usage
 
 ### Creating MongoDBServiceProvider Objects
 
@@ -70,7 +70,7 @@ await service.ClosePort();
 ```
 
 
-### MongoDBServiceProvider Options
+## Options
 
 ***Default Options***
 ```javascript
@@ -112,7 +112,7 @@ await service.ClosePort();
 The `MongoDBServiceProvider` takes advantage of MongoDB's [Tailable Cursors](https://docs.mongodb.com/manual/core/tailable-cursors/) feature.
 
 
-### Implementation
+## Implementation
 
 The `MongoDBServiceProvider` object implements all of the `ServiceProvider` methods.
 
@@ -136,7 +136,7 @@ The `MongoDBServiceProvider` object implements all of the `ServiceProvider` meth
 	- The tailable cursor is shut down as soon as it receives a reply.
 
 
-### Notes
+## Notes
 
 - [MongoDB Connection String](https://docs.mongodb.org/manual/reference/connection-string)
 - [MongoDB Tailable Cursors](https://docs.mongodb.com/manual/core/tailable-cursors/)

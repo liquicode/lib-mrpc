@@ -39,8 +39,6 @@ Tested with [RabbitMQ](https://www.rabbitmq.com/).
 
 ## Installation
 
-
-
 ## Usage
 
 ### Simple Usage

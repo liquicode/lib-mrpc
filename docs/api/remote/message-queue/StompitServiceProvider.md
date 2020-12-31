@@ -5,10 +5,6 @@
 ***Kinda non-functional at the moment !!!***
 
 
-
-# StompitServiceProvider
-
-
 ## Overview
 
 `stompit` is a 3rd party client for message queues that support the `stomp` protocol.
@@ -80,7 +76,7 @@ await service.ClosePort();
 ```
 
 
-### StompitServiceProvider Options
+## Options
 
 ***Default Options***
 ```javascript
