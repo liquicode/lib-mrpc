@@ -127,27 +127,60 @@ function ServiceProvider( ServiceName, Options )
 		MessageManager: MessageManager(),
 
 		//---------------------------------------------------------------------
-		UniqueID:
-			function UniqueID( Size = 12 )
+		RandomID:
+			function RandomID( Size = 12 )
 			{
+				function map_byte_value( Value, Min, Max )
+				{
+					Value /= 255;				// Convert Value to a percentage of its original range (0-255).
+					Value *= ( Max - Min );		// Map Value to the target range.
+					Value += Min;				// Shift Value to reside within the target range.
+					return Math.round( Value );
+				}
+
 				let alphabet = 'abcdefghijklmnopqrstuvwxyz1234567890';
 				let alphabet_1st = 'abcdefghijklmnopqrstuvwxyz';
+				let values = LIB_CRYPTO.randomBytes( Size );
 				let result = '';
 				for ( let index = 0; index < Size; index++ )
 				{
 					if ( index === 0 )
 					{
 						// Make sure the 1st character of the ID is non-numeric.
-						result += alphabet_1st[ LIB_CRYPTO.randomInt( 0, alphabet_1st.length - 1 ) ];
+						result += alphabet_1st[ map_byte_value( values[ index ], 0, alphabet_1st.length - 1 ) ];
 					}
 					else
 					{
 						// Use the entire alphabet for the rest of the ID.
-						result += alphabet[ LIB_CRYPTO.randomInt( 0, alphabet.length - 1 ) ];
+						result += alphabet[ map_byte_value( values[ index ], 0, alphabet.length - 1 ) ];
 					}
 				}
 				return result;
 			},
+
+		// //---------------------------------------------------------------------
+		// RandomID:
+		// 	function RandomID( Size = 12 )
+		// 	{
+		// 		let alphabet = 'abcdefghijklmnopqrstuvwxyz1234567890';
+		// 		let alphabet_1st = 'abcdefghijklmnopqrstuvwxyz';
+		// 		let result = '';
+		// 		for ( let index = 0; index < Size; index++ )
+		// 		{
+		// 			// ALERT: LIB_CRYPTO.randomInt requires Node v14.10.0, v12.19.0
+		// 			if ( index === 0 )
+		// 			{
+		// 				// Make sure the 1st character of the ID is non-numeric.
+		// 				result += alphabet_1st[ LIB_CRYPTO.randomInt( 0, alphabet_1st.length - 1 ) ];
+		// 			}
+		// 			else
+		// 			{
+		// 				// Use the entire alphabet for the rest of the ID.
+		// 				result += alphabet[ LIB_CRYPTO.randomInt( 0, alphabet.length - 1 ) ];
+		// 			}
+		// 		}
+		// 		return result;
+		// 	},
 
 		//---------------------------------------------------------------------
 		ApplyDefaultOptions:
@@ -211,7 +244,7 @@ function ServiceProvider( ServiceName, Options )
 					} );
 			},
 
-			
+
 		//---------------------------------------------------------------------
 		DefaultOptions: function DefaultOptions() { throw new Error( `DefaultOptions is not implemented in ServiceProvider.` ); },
 
@@ -229,7 +262,6 @@ function ServiceProvider( ServiceName, Options )
 
 	};
 }
-
 
 
 //---------------------------------------------------------------------

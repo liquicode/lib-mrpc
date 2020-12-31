@@ -36,8 +36,9 @@ describe( `00) ServiceProvider Tests`,
 			{
 				for ( let index = 0; index < 10; index++ )
 				{
-					let id = TestService.UniqueID();
-					// console.log( `${index + 1}\t${id}` );
+					let id = TestService.RandomID( 50 );
+					LIB_ASSERT.ok( id );
+					console.log( `${index + 1}\t${id}` );
 				}
 				return;
 			} );

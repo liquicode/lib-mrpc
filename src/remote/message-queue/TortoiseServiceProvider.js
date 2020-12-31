@@ -173,7 +173,7 @@ function TortoiseServiceProvider( ServiceName, Options )
 				async ( resolve, reject ) => 
 				{
 					// Setup the reply channel
-					let reply_id = service.UniqueID();
+					let reply_id = service.RandomID();
 					let channel = await service.QueueClient
 						.queue( `/queue/${service.ServiceName}/${EndpointName}/${reply_id}`, service.Options.reply_queue_options )
 						.prefetch( 1 )

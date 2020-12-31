@@ -236,7 +236,7 @@ function StompitServiceProvider( ServiceName, Options )
 		async function CallEndpoint( EndpointName, CommandParameters, CommandCallback ) 
 		{
 			// Setup the reply channel
-			let reply_id = service.UniqueID();
+			let reply_id = service.RandomID();
 			let reply_queue_name = `/queue/${service.ServiceName}/${EndpointName}/${reply_id}`;
 			let reply_channel = service.QueueClient.subscribe(
 				{

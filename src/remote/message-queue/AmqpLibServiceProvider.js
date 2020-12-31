@@ -188,7 +188,7 @@ function AmqpLibServiceProvider( ServiceName, Options )
 				{
 					let result_ok = null;
 					// Setup the reply channel
-					let reply_id = service.UniqueID();
+					let reply_id = service.RandomID();
 					let reply_queue_name = `${service.ServiceName}/${EndpointName}/${reply_id}`;
 					let reply_channel = await service.QueueClient.createChannel();
 					result_ok = await reply_channel.assertQueue( reply_queue_name, service.Options.reply_queue_options );

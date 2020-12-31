@@ -162,7 +162,7 @@ function FSWatchServiceProvider( ServiceName, Options )
 						LIB_FS.mkdirSync( command_path, { recursive: true } );
 					}
 					// Initiate a file watcher for reply files.
-					let reply_id = service.UniqueID();
+					let reply_id = service.RandomID();
 					let reply_filename = reply_id + '.reply';
 					let reply_watcher = LIB_FS.watch(
 						command_path,
@@ -216,7 +216,7 @@ function FSWatchServiceProvider( ServiceName, Options )
 						ReplyID: reply_id,
 					};
 					// Create a command file.
-					let command_id = service.UniqueID();
+					let command_id = service.RandomID();
 					let command_filename = LIB_PATH.join( command_path, command_id + '.cmd' );
 					LIB_FS.writeFileSync( command_filename, JSON.stringify( message ) );
 				} );

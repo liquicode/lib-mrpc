@@ -153,7 +153,7 @@ function RedisServiceProvider( ServiceName, Options )
 				async ( resolve, reject ) => 
 				{
 					// Setup the reply channel
-					let reply_id = service.UniqueID();
+					let reply_id = service.RandomID();
 					let reply_queue_name = `${service.ServiceName}/${EndpointName}/${reply_id}`;
 					let reply_channel = LIB_REDIS.createClient( service.Options );
 					reply_channel.on( 'message',

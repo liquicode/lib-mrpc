@@ -44,7 +44,7 @@ These are some convenience functions to be used by `ServiceProvider` implementat
 - `function ApplyDefaultOptions( UserOptions )`:
 	This function is used internally by ServiceProvider constructurs to merge application supplied option values with default option values.
 
-- `function UniqueID( Size )`
+- `function RandomID( Size )`
 	Returns a unique identifier string of `Size` characters.
 
 - `async function Sleep( Milliseconds )`

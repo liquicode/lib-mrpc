@@ -245,7 +245,7 @@ function MongoDBServiceProvider( ServiceName, Options )
 				async ( resolve, reject ) => 
 				{
 					// Setup the reply channel
-					let reply_id = service.UniqueID();
+					let reply_id = service.RandomID();
 
 					// Get the collection used for service messages.
 					let collection = await create_capped_collection( service.MongoDatabase, service.ServiceName, service.Options );
