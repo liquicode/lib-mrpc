@@ -158,30 +158,6 @@ function ServiceProvider( ServiceName, Options )
 				return result;
 			},
 
-		// //---------------------------------------------------------------------
-		// RandomID:
-		// 	function RandomID( Size = 12 )
-		// 	{
-		// 		let alphabet = 'abcdefghijklmnopqrstuvwxyz1234567890';
-		// 		let alphabet_1st = 'abcdefghijklmnopqrstuvwxyz';
-		// 		let result = '';
-		// 		for ( let index = 0; index < Size; index++ )
-		// 		{
-		// 			// ALERT: LIB_CRYPTO.randomInt requires Node v14.10.0, v12.19.0
-		// 			if ( index === 0 )
-		// 			{
-		// 				// Make sure the 1st character of the ID is non-numeric.
-		// 				result += alphabet_1st[ LIB_CRYPTO.randomInt( 0, alphabet_1st.length - 1 ) ];
-		// 			}
-		// 			else
-		// 			{
-		// 				// Use the entire alphabet for the rest of the ID.
-		// 				result += alphabet[ LIB_CRYPTO.randomInt( 0, alphabet.length - 1 ) ];
-		// 			}
-		// 		}
-		// 		return result;
-		// 	},
-
 		//---------------------------------------------------------------------
 		ApplyDefaultOptions:
 			function ApplyDefaultOptions( UserOptions )
